@@ -6,6 +6,7 @@ import {
 } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import Layout from "./layout/Layout";
+import Airplane from "../assets/images/airplane.jpeg";
 
 const defaultDestinations = [
   {
@@ -51,8 +52,8 @@ const TopDestinations = ({ destinations = defaultDestinations }) => {
     <Layout>
       <section className="bg-white px-6 py-20 sm:px-10 lg:px-12 lg:py-28">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-12 flex flex-col gap-5 sm:mb-14 sm:flex-row sm:items-end sm:justify-between">
-            <div className="">
+          <div className="relative mb-12 flex flex-col gap-5 sm:mb-14 sm:flex-row sm:items-end sm:justify-between">
+            <div className="relative z-10 max-w-2xl">
               <p className="mb-3 text-xs font-bold uppercase tracking-[0.3em] text-cyan-600">
                 Explore the world
               </p>
@@ -64,9 +65,14 @@ const TopDestinations = ({ destinations = defaultDestinations }) => {
                 our handpicked travel experiences.
               </p>
             </div>
+            <img
+              className="relative opacity-20 z-0 mx-auto mt- w-56 object-contain mix-blend-multiply sm:w-64 md:absolute md:right-0 md:top-1/2 md:-mt-20 md:-translate-y-1/2 lg:w-150"
+              src={Airplane}
+              alt="Airplane illustration"
+            />
             <Link
               to="/destination"
-              className="group inline-flex items-center gap-2 text-sm font-bold text-cyan-700 transition hover:text-slate-900"
+              className="group relative z-10 inline-flex items-center gap-2 text-sm font-bold text-cyan-700 transition hover:text-slate-900"
             >
               View all destinations
               <FiArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
