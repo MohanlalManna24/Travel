@@ -6,6 +6,7 @@ import {
 import { MdAddchart } from "react-icons/md";
 import { HiMiniUserGroup } from "react-icons/hi2";
 import { MdOutlineSupportAgent } from "react-icons/md";
+import Layout from "./layout/Layout";
 
 const WhyChoose = () => {
   const benefits = [
@@ -48,45 +49,47 @@ const WhyChoose = () => {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-slate-50 px-6 py-20 sm:px-10 lg:px-12 lg:py-28">
-      <div className="absolute -right-24 top-16 h-64 w-64 rounded-full bg-cyan-100/60 blur-3xl" />
-      <div className="absolute -left-32 bottom-0 h-72 w-72 rounded-full bg-amber-100/50 blur-3xl" />
+      <section className="relative overflow-hidden bg-slate-50 px-6 py-20 sm:px-10 lg:px-12 lg:py-28">
+          <Layout>
+        <div className="absolute -right-24 top-16 h-64 w-64 rounded-full bg-cyan-100/60 blur-3xl" />
+        <div className="absolute -left-32 bottom-0 h-72 w-72 rounded-full bg-amber-100/50 blur-3xl" />
 
-      <div className="relative mx-auto max-w-7xl">
-        <div className="mb-12 max-w-2xl flex flex-col items-center justify-center text-center sm:mx-auto sm:mb-16">
-          <h1 className="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-            Why Choose <span className="text-cyan-600">Travel.</span>
-          </h1>
-          <p className="mt-5 max-w-xl text-base leading-7 text-slate-600 sm:text-lg">
-            We offer most competitive rates and offers for wonderful and beautiful
-            places.
-          </p>
-        </div>
+        <div className="relative mx-auto max-w-7xl">
+          <div className="mb-12 max-w-2xl flex flex-col items-center justify-center text-center sm:mx-auto sm:mb-16">
+            <h1 className="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+              Why Choose <span className="text-cyan-600">Travel.</span>
+            </h1>
+            <p className="mt-5 max-w-xl text-base leading-7 text-slate-600 sm:text-lg">
+              We offer most competitive rates and offers for wonderful and
+              beautiful places.
+            </p>
+          </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {benefits.map(({ icon: Icon, title, description }, index) => (
-            <article
-              key={title}
-              className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-2 hover:border-cyan-200 hover:shadow-xl hover:shadow-cyan-900/10"
-            >
-              <span className="absolute right-6 top-5 text-5xl font-black text-slate-100 transition-colors duration-300 group-hover:text-cyan-50">
-                0{index + 1}
-              </span>
-              <div className="relative mb-7 grid h-14 w-14 place-items-center rounded-2xl bg-cyan-50 text-2xl text-cyan-600 transition duration-300 group-hover:rotate-6 group-hover:bg-cyan-600 group-hover:text-white">
-                <Icon />
-              </div>
-              <h2 className="relative text-xl font-extrabold text-slate-900">
-                {title}
-              </h2>
-              <p className="mt-3 text-sm leading-6 text-slate-600">
-                {description}
-              </p>
-              <div className="mt-6 h-1 w-8 rounded-full bg-cyan-300 transition-all duration-300 group-hover:w-16 group-hover:bg-cyan-600" />
-            </article>
-          ))}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {benefits.map(({ icon: Icon, title, description }, index) => (
+              <article
+                key={title}
+                className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-2 hover:border-cyan-200 hover:shadow-xl hover:shadow-cyan-900/10"
+              >
+                <span className="absolute right-6 top-5 text-5xl font-black text-slate-100 transition-colors duration-300 group-hover:text-cyan-50">
+                  0{index + 1}
+                </span>
+                <div className="relative mb-7 grid h-14 w-14 place-items-center rounded-2xl bg-cyan-50 text-2xl text-cyan-600 transition duration-300 group-hover:rotate-6 group-hover:bg-cyan-600 group-hover:text-white">
+                  <Icon />
+                </div>
+                <h2 className="relative text-xl font-extrabold text-slate-900">
+                  {title}
+                </h2>
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  {description}
+                </p>
+                <div className="mt-6 h-1 w-8 rounded-full bg-cyan-300 transition-all duration-300 group-hover:w-16 group-hover:bg-cyan-600" />
+              </article>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+    </Layout>
+      </section>
   );
 };
 
