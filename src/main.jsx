@@ -10,6 +10,7 @@ import Contact from "./pages/Contact.jsx";
 import SignUp from "./pages/auth/SingUp.jsx";
 import SignIn from "./pages/auth/SingIn.jsx";
 import NotFound from "./pages/NotFound.jsx";
+import DetailsDestination from "./pages/DetailsDestination.jsx";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: "about", element: <About /> },
       { path: "destination", element: <Destination /> },
+      { path: "destination/:destinationId", element: <DetailsDestination /> },
       { path: "contact", element: <Contact /> },
       {path: "auth/signup", element: <SignUp />},
       {path: "auth/signIn", element: <SignIn />},

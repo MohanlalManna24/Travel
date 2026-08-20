@@ -14,7 +14,7 @@ const DestinationCards = () => {
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS-8XeEWA3EoWb2GUYM5ihW5eV5pWQCcdbPl_a8dOjDw&s=10",
       pricePerHead: 39999,
       days: 4,
-      detailsUrl: "/destination",
+      detailsUrl: "/destination/destination-1",
       bookingUrl: "/contact",
     },
     {
@@ -27,7 +27,7 @@ const DestinationCards = () => {
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgVCdmoJTNaY6lKIJsAxKgGNjiOSuHc92AcBz-5ppxyA&s=10",
       pricePerHead: 59899,
       days: 5,
-      detailsUrl: "/destination",
+      detailsUrl: "/destination/destination-2",
       bookingUrl: "/contact",
     },
     {
@@ -40,7 +40,7 @@ const DestinationCards = () => {
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpeeEsr1YK_qI9o5Xp3LNcls6fX_7BKdcnN4CDtVl9LQ&s=10",
       pricePerHead: 14999,
       days: 4,
-      detailsUrl: "/destination",
+      detailsUrl: "/destination/destination-3",
       bookingUrl: "/contact",
     },
   ];
