@@ -1,6 +1,5 @@
 import { FiArrowRight } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import Airplane from "../assets/images/airplane.jpeg";
 import DestinationCards from "./DestinationCards.jsx";
 
 const TopDestinations = () => {
@@ -20,11 +19,6 @@ const TopDestinations = () => {
               our handpicked travel experiences.
             </p>
           </div>
-          <img
-            className="pointer-events-none absolute right-0 top-1/2 z-0 hidden w-64 -translate-y-1/2 opacity-20 mix-blend-multiply md:block lg:w-96"
-            src={Airplane}
-            alt=""
-          />
           <Link
             to="/destination"
             className="group relative z-10 inline-flex items-center gap-2 text-sm font-bold text-cyan-700 transition hover:text-slate-900"
