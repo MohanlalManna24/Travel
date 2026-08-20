@@ -16,9 +16,9 @@ function Destination() {
     <main className="overflow-hidden bg-[#f7fbfa]">
       <section className="relative isolate bg-[#073b4c] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(6,214,160,0.35),transparent_28%),radial-gradient(circle_at_88%_10%,rgba(255,209,102,0.25),transparent_24%)]" />
-        <div className="absolute -bottom-24 -right-16 h-64 w-64 rounded-full border-[28px] border-[#ef476f]/30 sm:h-96 sm:w-96" />
+        <div className="absolute -bottom-24 -right-16 h-64 w-64 rounded-full border-28 border-[#ef476f]/30 sm:h-96 sm:w-96" />
         <Layout>
-          <div className="relative grid min-h-[540px] items-center gap-10 px-6 py-16 sm:px-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-12 lg:py-20">
+          <div className="relative grid min-h-135 items-center gap-10 px-6 py-16 sm:px-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-12 lg:py-20">
             <div className="max-w-xl">
               <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-[#ffd166] backdrop-blur-sm">
                 <FiCompass /> Curated escapes
@@ -52,7 +52,7 @@ function Destination() {
                 <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#ef476f]/15 text-[#ef476f]"><FiHeart /></span>
                 Loved by 2,000+ travelers
               </div>
-              <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border-8 border-white/15 bg-[#118ab2] shadow-2xl shadow-black/25">
+              <div className="relative aspect-4/5 overflow-hidden rounded-4xl border-8 border-white/15 bg-[#118ab2] shadow-2xl shadow-black/25">
                 <img src={heroImage} alt="A colorful travel scene" className="h-full w-full object-cover" />
                 <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-[#073b4c]/90 to-transparent p-6 pt-24">
                   <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#ffd166]">The world is wide</p>

@@ -36,9 +36,9 @@ const About = () => {
     <main className="overflow-hidden bg-[#f7fbfa]">
       <section className="relative isolate bg-[#073b4c] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(239,71,111,0.32),transparent_28%),radial-gradient(circle_at_10%_80%,rgba(6,214,160,0.28),transparent_30%)]" />
-        <div className="absolute -left-20 top-10 h-40 w-40 rounded-full border-[18px] border-[#ffd166]/30" />
+        <div className="absolute -left-20 top-10 h-40 w-40 rounded-full border-18 border-[#ffd166]/30" />
         <Layout>
-          <div className="relative grid min-h-[510px] items-center gap-12 px-6 py-16 sm:px-10 lg:grid-cols-[1fr_0.9fr] lg:px-12 lg:py-20">
+          <div className="relative grid min-h-127.5 items-center gap-12 px-6 py-16 sm:px-10 lg:grid-cols-[1fr_0.9fr] lg:px-12 lg:py-20">
             <div className="max-w-2xl">
               <p className="mb-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.28em] text-[#ffd166]">
                 <span className="h-2 w-2 rounded-full bg-[#ef476f]" /> The people behind Travel.
@@ -65,7 +65,7 @@ const About = () => {
                 <p className="text-3xl font-black">8 yrs</p>
                 <p className="text-xs font-bold uppercase tracking-widest text-white/75">of wander</p>
               </div>
-              <div className="aspect-square overflow-hidden rounded-[2rem] border-8 border-white/15 bg-[#118ab2] shadow-2xl shadow-black/25">
+              <div className="aspect-square overflow-hidden rounded-4xl border-8 border-white/15 bg-[#118ab2] shadow-2xl shadow-black/25">
                 <img src={heroImage} alt="A colorful travel landscape" className="h-full w-full object-cover" />
               </div>
               <div className="absolute -bottom-6 -left-5 flex items-center gap-3 rounded-2xl bg-white px-4 py-3 text-[#073b4c] shadow-xl sm:-left-10">
