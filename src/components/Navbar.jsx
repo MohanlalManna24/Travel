@@ -62,7 +62,7 @@ const Navbar = () => {
 
             <div className="hidden items-center gap-3 md:flex">
               {isLogin ? (
-                <Link to="/profile" className="flex items-center text-white border border-white/80 rounded-full px-4 py-2 text-sm font-semibold transition hover:border-cyan-300 hover:text-cyan-300">
+                <Link to="/profile/overview" className="flex items-center text-white border border-white/80 rounded-full px-4 py-2 text-sm font-semibold transition hover:border-cyan-300 hover:text-cyan-300">
                   <IoPerson className="inline-block mr-1 text-lg" />
                   Profile
                 </Link>

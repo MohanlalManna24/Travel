@@ -11,6 +11,9 @@ import SignUp from "./pages/auth/SingUp.jsx";
 import SignIn from "./pages/auth/SingIn.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import DetailsDestination from "./pages/DetailsDestination.jsx";
+import ProfileLayout from "./pages/ProfileLayout.jsx";
+import Overview from "./pages/MyProfile/Overview.jsx";
+import Trips from "./pages/MyProfile/Trips.jsx";
 
 const router = createBrowserRouter([
   {
@@ -22,9 +25,18 @@ const router = createBrowserRouter([
       { path: "destination", element: <Destination /> },
       { path: "destination/:destinationId", element: <DetailsDestination /> },
       { path: "contact", element: <Contact /> },
-      {path: "auth/signup", element: <SignUp />},
-      {path: "auth/signIn", element: <SignIn />},
+      { path: "auth/signup", element: <SignUp /> },
+      { path: "auth/signin", element: <SignIn /> },
       { path: "*", element: <NotFound /> },
+    ],
+  },
+  {
+    path: "/profile",
+    element: <ProfileLayout />,
+    children: [
+      { index: true, element: <Overview /> },
+      { path: "overview", element: <Overview /> },
+      { path: "trips", element: <Trips /> },
     ],
   },
 ]);
