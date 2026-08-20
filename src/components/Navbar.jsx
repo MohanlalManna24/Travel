@@ -3,8 +3,14 @@ import { FiArrowRight, FiMenu, FiX } from "react-icons/fi";
 import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/icons/logo.png";
 import Layout from "./layout/Layout.jsx";
+import { IoPerson } from "react-icons/io5";
+import { FaArrowUpRightFromSquare } from "react-icons/fa6";
+
+
 
 const Navbar = () => {
+  const [isLogin, setIsLogin] = useState(true); // Replace with actual login state from your authentication logic
+
   const menuItems = [
     { name: "Home", to: "/" },
     { name: "About", to: "/about" },
@@ -55,12 +61,20 @@ const Navbar = () => {
             </nav>
 
             <div className="hidden items-center gap-3 md:flex">
-              <Link
-                to="/auth/signin"
-                className="rounded-full px-4 py-2 text-sm font-semibold text-white/80 transition hover:text-white"
-              >
-                Login
-              </Link>
+              {isLogin ? (
+                <Link to="/profile" className="flex items-center text-white border border-white/80 rounded-full px-4 py-2 text-sm font-semibold transition hover:border-cyan-300 hover:text-cyan-300">
+                  <IoPerson className="inline-block mr-1 text-lg" />
+                  Profile
+                </Link>
+              ) : (
+                <Link
+                  to="/auth/signin"
+                  className="flex items-center text-white border border-white/80 rounded-full px-4 py-2 text-sm font-semibold transition hover:border-cyan-300 hover:text-cyan-300"
+                >
+                  Login
+                  <FaArrowUpRightFromSquare className="inline-block my-1 mx-2.5 text-lg" />
+                </Link>
+              )}
               <NavLink
                 to="/contact"
                 className="group inline-flex items-center gap-2 rounded-full bg-cyan-300 px-4 py-2.5 text-sm font-bold text-slate-950 transition duration-300 hover:-translate-y-0.5 hover:bg-white"
@@ -104,19 +118,19 @@ const Navbar = () => {
                     {item.name}
                   </NavLink>
                 ))}
-                  <NavLink
-                    to="/signup"
-                    onClick={() => setIsMenuOpen(false)}
-                    className={({ isActive }) =>
-                      `rounded-xl px-4 py-3 text-sm font-semibold transition ${
-                        isActive
-                          ? "bg-cyan-300 text-slate-950"
-                          : "text-white/80 hover:bg-white/10 hover:text-white"
-                      }`
-                    }
-                  >
-                    Sign Up
-                  </NavLink>
+                <NavLink
+                  to="/signup"
+                  onClick={() => setIsMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                      isActive
+                        ? "bg-cyan-300 text-slate-950"
+                        : "text-white/80 hover:bg-white/10 hover:text-white"
+                    }`
+                  }
+                >
+                  Sign Up
+                </NavLink>
               </div>
             </div>
           </nav>
