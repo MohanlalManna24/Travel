@@ -104,7 +104,7 @@ function Destination() {
             ))}
           </div>
 
-          <DestinationCards />
+          <DestinationCards requireAuthForDetails={true} />
         </Layout>
       </section>
 

@@ -1,8 +1,35 @@
 import React from "react";
 import { FiClock, FiImage, FiTag } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const DestinationCards = () => {
+const DestinationCards = ({
+  detailsBasePath = "/destination",
+  requireAuthForDetails = false,
+}) => {
+  const navigate = useNavigate();
+
+  const isUserLoggedIn = () => {
+    if (typeof window === "undefined") return false;
+    return (
+      localStorage.getItem("isLoggedIn") === "true" ||
+      Boolean(localStorage.getItem("token")) ||
+      Boolean(localStorage.getItem("authToken")) ||
+      Boolean(localStorage.getItem("user"))
+    );
+  };
+
+  const getDetailsPath = (destinationId) =>
+    `${detailsBasePath.replace(/\/$/, "")}/${destinationId}`;
+
+  const handleDetailsClick = (event, destinationId) => {
+    const detailsPath = getDetailsPath(destinationId);
+
+    if (requireAuthForDetails && !isUserLoggedIn()) {
+      event.preventDefault();
+      navigate("/auth/signin", { state: { from: detailsPath } });
+    }
+  };
+
   const defaultDestinations = [
     {
       id: "destination-1",
@@ -56,9 +83,10 @@ const DestinationCards = () => {
             image,
             pricePerHead,
             days,
-            detailsUrl = "/destination",
             bookingUrl = "/contact",
           } = destination;
+
+          const detailsUrl = getDetailsPath(id);
 
           return (
             <article
@@ -112,6 +140,7 @@ const DestinationCards = () => {
                 <div className="flex gap-3">
                   <Link
                     to={detailsUrl}
+                    onClick={(event) => handleDetailsClick(event, id)}
                     className="flex-1 rounded-xl border border-slate-300 px-4 py-3 text-center text-sm font-bold text-slate-700 transition hover:border-cyan-500 hover:text-cyan-700"
                   >
                     See details

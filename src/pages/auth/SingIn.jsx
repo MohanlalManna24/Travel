@@ -6,9 +6,11 @@ import { IoIosArrowRoundForward } from "react-icons/io";
 import { IoMail } from "react-icons/io5";
 import { FaEye, FaEyeSlash  } from "react-icons/fa";
 import travelIllustration from "../../assets/images/img2.jpg";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const SingUp = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -23,7 +25,10 @@ const SingUp = () => {
   }
   const handleSubmit = (e) => {
     e.preventDefault();
+    localStorage.setItem("isLoggedIn", "true");
     console.log("Form submitted:", formData);
+    const redirectPath = location.state?.from || "/profile/overview";
+    navigate(redirectPath, { replace: true });
   }
   return (
     <main className="min-h-[calc(100vh-5rem)] bg-[#f5f3ed] px-4 py-8 sm:px-6 lg:px-10">

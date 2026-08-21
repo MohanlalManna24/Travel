@@ -14,6 +14,7 @@ import DetailsDestination from "./pages/DetailsDestination.jsx";
 import ProfileLayout from "./pages/ProfileLayout.jsx";
 import Overview from "./pages/MyProfile/Overview.jsx";
 import Trips from "./pages/MyProfile/Trips.jsx";
+import ProfileDetails from "./pages/MyProfile/ProfileDetails.jsx";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,8 @@ const router = createBrowserRouter([
       { index: true, element: <Overview /> },
       { path: "overview", element: <Overview /> },
       { path: "trips", element: <Trips /> },
+      { path: "trips/:destinationId", element: <DetailsDestination /> },
+      { path: "details", element: <ProfileDetails /> },
     ],
   },
 ]);
