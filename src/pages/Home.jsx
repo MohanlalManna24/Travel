@@ -10,7 +10,7 @@ function Home() {
     <main>
       <HeroSection />
       <WhyChoose />
-      <TopDestinations />
+      <TopDestinations/>
       <Testimonial />
 
       <section className="relative h-64 w-full overflow-hidden sm:h-80 lg:h-112">

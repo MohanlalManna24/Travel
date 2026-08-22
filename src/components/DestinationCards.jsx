@@ -6,6 +6,7 @@ import axios from "axios";
 const DestinationCards = ({
   detailsBasePath = "/destination",
   requireAuthForDetails = false,
+  limit
 }) => {
   const navigate = useNavigate();
 
@@ -37,7 +38,8 @@ const DestinationCards = ({
   const fetchDestinationDetails = async () => {
     try { 
       const response = await axios.get(DESTINATIONS_DETAILS_URL);
-      setDestinationDetails(response.data);
+      const data = limit ? response.data.slice(0, limit) : response.data;
+      setDestinationDetails(data);
     } catch (error) {
       console.error("Error fetching destination details:", error);
     }
