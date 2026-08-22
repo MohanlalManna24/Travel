@@ -118,19 +118,36 @@ const Navbar = () => {
                     {item.name}
                   </NavLink>
                 ))}
-                <NavLink
-                  to="/signup"
-                  onClick={() => setIsMenuOpen(false)}
-                  className={({ isActive }) =>
-                    `rounded-xl px-4 py-3 text-sm font-semibold transition ${
-                      isActive
-                        ? "bg-cyan-300 text-slate-950"
-                        : "text-white/80 hover:bg-white/10 hover:text-white"
-                    }`
-                  }
-                >
-                  Sign Up
-                </NavLink>
+                {isLogin ? (
+                  <Link
+                    to="/profile/overview"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center rounded-xl px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white"
+                  >
+                    <IoPerson className="mr-2 text-lg" />
+                    Profile
+                  </Link>
+                ) : (
+                  <Link
+                    to="/auth/signin"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center rounded-xl px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white"
+                  >
+                    <FaArrowUpRightFromSquare className="mr-2 text-lg" />
+                    Login
+                  </Link>
+                )}
+                
+                <div className="mt-2 border-t border-white/10 pt-3">
+                  <Link
+                    to="/contact"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-300 px-4 py-3 text-sm font-bold text-slate-950 transition duration-300 hover:bg-white"
+                  >
+                    Book now
+                    <FiArrowRight />
+                  </Link>
+                </div>
               </div>
             </div>
           </nav>
