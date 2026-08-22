@@ -47,7 +47,7 @@ const About = () => {
                 We make the world feel a little <span className="text-[#06d6a0]">closer.</span>
               </h1>
               <p className="mt-7 max-w-xl text-base leading-7 text-cyan-50/75 sm:text-lg">
-                Travel. began with a simple belief: planning a trip should feel
+                Ghure Ashi began with a simple belief: planning a trip should feel
                 as exciting as taking one. Today, we help curious people find
                 meaningful places, memorable stays, and more reasons to wander.
               </p>

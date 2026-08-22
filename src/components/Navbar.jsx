@@ -36,7 +36,7 @@ const Navbar = () => {
                 className="h-10 w-10 object-contain transition-transform duration-300 group-hover:rotate-6"
               />
               <span className="text-xl font-black tracking-tight text-white">
-                Travel<span className="text-cyan-300">.</span>
+                Ghure<span className="text-cyan-300 pl-1">Ashi</span>
               </span>
             </NavLink>
 

@@ -57,7 +57,7 @@ const WhyChoose = () => {
         <div className="relative mx-auto max-w-7xl">
           <div className="mb-12 max-w-2xl flex flex-col items-center justify-center text-center sm:mx-auto sm:mb-16">
             <h1 className="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-              Why Choose <span className="text-cyan-600">Travel.</span>
+              Why Choose <span className="text-cyan-600">GhureAshi</span>
             </h1>
             <p className="mt-5 max-w-xl text-base leading-7 text-slate-600 sm:text-lg">
               We offer most competitive rates and offers for wonderful and

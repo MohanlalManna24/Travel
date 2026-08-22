@@ -22,7 +22,7 @@ const Footer = () => {
                 <img src={logo} alt="logo"/>
               </div>
 
-              <span className="text-2xl font-bold tracking-tight">Travel.</span>
+              <span className="text-2xl font-bold tracking-tight">GhureAshi</span>
             </a>
 
             <p className="mt-5 max-w-sm text-sm leading-7 text-gray-400">
