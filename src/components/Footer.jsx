@@ -12,10 +12,10 @@ const Footer = () => {
       <div className="pointer-events-none absolute -right-40 bottom-0 h-96 w-96 rounded-full bg-violet-500/10 blur-[120px]" />
 
       {/* Main Footer */}
-      <div className="relative mx-auto max-w-7xl px-6 py-16 sm:px-8 lg:px-10">
-        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="relative mx-auto max-w-7xl px-6 py-12 sm:px-8 lg:px-10 lg:py-20">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-12 md:grid-cols-3 lg:grid-cols-5">
           {/* Brand */}
-          <div className="lg:col-span-2">
+          <div className="col-span-2 flex flex-col items-left text-left">
             <a href="#" className="group inline-flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br from-cyan-400 to-violet-500 shadow-lg shadow-cyan-500/10 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">
                 <span className="text-xl font-black text-white">T</span>
@@ -30,7 +30,7 @@ const Footer = () => {
             </p>
 
             {/* Contact */}
-            <div className="mt-7 space-y-3 text-sm text-gray-400">
+            <div className="mt-8 flex flex-col items-start space-y-4 text-sm text-gray-400">
               <div className="flex items-center gap-3 transition-colors hover:text-white">
                 <FiMail className="text-cyan-400" />
                 hello@travel.com
@@ -49,12 +49,12 @@ const Footer = () => {
           </div>
 
           {/* Explore */}
-          <div>
+          <div className="flex flex-col items-start">
             <h3 className="mb-5 text-sm font-semibold uppercase tracking-wider text-white">
               Explore
             </h3>
 
-            <ul className="space-y-3 text-sm text-gray-400">
+            <ul className="flex flex-col items-start space-y-4 text-sm text-gray-400">
               {[
                 "Destinations",
                 "Tours",
@@ -79,12 +79,12 @@ const Footer = () => {
           </div>
 
           {/* Company */}
-          <div>
+          <div className="flex flex-col items-start">
             <h3 className="mb-5 text-sm font-semibold uppercase tracking-wider text-white">
               Company
             </h3>
 
-            <ul className="space-y-3 text-sm text-gray-400">
+            <ul className="flex flex-col items-start space-y-4 text-sm text-gray-400">
               {["About Us", "Our Team", "Careers", "Contact", "Blog"].map(
                 (item) => (
                   <li key={item}>
@@ -105,12 +105,12 @@ const Footer = () => {
           </div>
 
           {/* Support */}
-          <div>
+          <div className="flex flex-col items-start">
             <h3 className="mb-5 text-sm font-semibold uppercase tracking-wider text-white">
               Support
             </h3>
 
-            <ul className="space-y-3 text-sm text-gray-400">
+            <ul className="flex flex-col items-start space-y-4 text-sm text-gray-400">
               {[
                 "Help Center",
                 "FAQs",
@@ -136,16 +136,16 @@ const Footer = () => {
         </div>
 
         {/* Divider */}
-        <div className="my-10 h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
+        <div className="my-10 h-px w-full bg-linear-to-r from-transparent via-white/10 to-transparent" />
 
         {/* Bottom */}
-        <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
+        <div className="flex flex-col-reverse items-center justify-between gap-6 md:flex-row">
           <p className="text-center text-sm text-gray-500 md:text-left">
-            © {currentYear} Trevora. All rights reserved.
+            © {currentYear} Travel. All rights reserved.
           </p>
 
           {/* Social Icons */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-4">
             {[
               {
                 icon: <FaFacebookF />,

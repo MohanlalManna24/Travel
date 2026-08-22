@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { FaQuoteLeft, FaStar } from "react-icons/fa6";
 import { FiArrowRight } from "react-icons/fi";
 import Layout from "./layout/Layout";
-
+import axios from "axios";
+  
 const defaultTestimonials = [
   {
     id: "testimonial-1",
@@ -24,9 +25,8 @@ const Testimonial = () => {
    useEffect(() => {
       const fetchTestimonial = async () => {
         try {
-          const response = await fetch(TESIMONIAL_URL);
-          const data = await response.json();
-          setTestimonials(data);
+          const response = await axios.get(TESIMONIAL_URL);
+          setTestimonials(response.data);
         } catch (error) {
           console.error("Error fetching testimonials:", error);
         }
