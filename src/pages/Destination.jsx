@@ -9,7 +9,6 @@ import {
 import { Link } from "react-router-dom";
 import DestinationCards from "../components/DestinationCards";
 import Layout from "../components/layout/Layout";
-import heroImage from "../assets/images/heroImg.png";
 
 function Destination() {
   return (
@@ -53,7 +52,7 @@ function Destination() {
                 Loved by 2,000+ travelers
               </div>
               <div className="relative aspect-4/5 overflow-hidden rounded-4xl border-8 border-white/15 bg-[#118ab2] shadow-2xl shadow-black/25">
-                <img src={heroImage} alt="A colorful travel scene" className="h-full w-full object-cover" />
+                <img src="https://img.magnific.com/premium-photo/create-image-symbolizing-world-travel-landmarks-family_980716-3433.jpg?w=1500" alt="A colorful travel scene" className="h-full w-full object-cover" loading="lazy" />
                 <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-[#073b4c]/90 to-transparent p-6 pt-24">
                   <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#ffd166]">The world is wide</p>
                   <p className="mt-2 text-2xl font-black">Your next chapter starts here.</p>

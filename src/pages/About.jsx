@@ -8,7 +8,7 @@ import {
 } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import Layout from "../components/layout/Layout";
-import heroImage from "../assets/images/heroImg.png";
+import img from "../assets/images/3d-travel-with-airplane.jpg";
 
 const values = [
   {
@@ -66,7 +66,7 @@ const About = () => {
                 <p className="text-xs font-bold uppercase tracking-widest text-white/75">of wander</p>
               </div>
               <div className="aspect-square overflow-hidden rounded-4xl border-8 border-white/15 bg-[#118ab2] shadow-2xl shadow-black/25">
-                <img src={heroImage} alt="A colorful travel landscape" className="h-full w-full object-cover" />
+                <img src={img} alt="A colorful travel landscape" className="h-full w-full object-cover" />
               </div>
               <div className="absolute -bottom-6 -left-5 flex items-center gap-3 rounded-2xl bg-white px-4 py-3 text-[#073b4c] shadow-xl sm:-left-10">
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#06d6a0]/15 text-xl text-[#069c78]"><FiStar /></span>
