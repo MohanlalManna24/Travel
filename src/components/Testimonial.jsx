@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";  
 import { FaQuoteLeft, FaStar } from "react-icons/fa6";
 import { FiArrowRight } from "react-icons/fi";
 import Layout from "./layout/Layout";
@@ -12,29 +13,27 @@ const defaultTestimonials = [
     quote:
       "Travel turned our holiday into a collection of moments we will talk about for years. Every detail felt thoughtful and effortless.",
     rating: 5,
-  },
-  {
-    id: "testimonial-2",
-    name: "Arjun Mehta",
-    role: "Frequent explorer",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRP66xZe_6NzZqJBWm79x8S2MHyt4QklAK-9-jQ-IRAFw&s=10",
-    quote:
-      "The recommendations were exactly what we were looking for. We found incredible places that we would never have discovered alone.",
-    rating: 5,
-  },
-  {
-    id: "testimonial-3",
-    name: "Sofia Williams",
-    role: "Family traveller",
-    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScXbbl8siRgJ3SAhezCz762YBtw2r61vZGpiVMZVHlyA&s=10",
-    initials: "SW",
-    quote:
-      "From booking to coming home, the whole experience was smooth. Our family trip felt personal, comfortable, and genuinely special.",
-    rating: 5,
-  },
+  }
 ];
 
-const Testimonial = ({ testimonials = defaultTestimonials }) => {
+const Testimonial = () => {
+
+   const [testimonials, setTestimonials] = useState(defaultTestimonials);
+
+  const TESIMONIAL_URL= import.meta.env.VITE_TESTIMONIAL_URL;
+   useEffect(() => {
+      const fetchTestimonial = async () => {
+        try {
+          const response = await fetch(TESIMONIAL_URL);
+          const data = await response.json();
+          setTestimonials(data);
+        } catch (error) {
+          console.error("Error fetching testimonials:", error);
+        }
+      };
+      fetchTestimonial();
+    }, []); 
+
   return (
     <section className="relative overflow-hidden bg-slate-50 px-6 py-20 text-slate-900 sm:px-10 lg:px-12 lg:py-28">
       <div className="absolute -left-24 top-20 h-72 w-72 rounded-full bg-cyan-100/70 blur-3xl" />

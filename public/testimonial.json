@@ -1,0 +1,31 @@
+ [
+  {
+    "id": "testimonial-1",
+    "name": "Maya Thompson",
+    "role": "Adventure traveller",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlnulzN_oRasL3W8LZ7Qk2ff7GMizsIpmanCisPjP6dA&s=10",
+    "initials": "MT",
+    "quote":
+      "Travel turned our holiday into a collection of moments we will talk about for years. Every detail felt thoughtful and effortless.",
+    "rating": 5
+  },
+  {
+    "id": "testimonial-2",
+    "name": "Arjun Mehta",
+    "role": "Frequent explorer",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRP66xZe_6NzZqJBWm79x8S2MHyt4QklAK-9-jQ-IRAFw&s=10",
+    "quote":
+      "The recommendations were exactly what we were looking for. We found incredible places that we would never have discovered alone.",
+    "rating": 5
+  },
+  {
+    "id": "testimonial-3",
+    "name": "Sofia Williams",
+    "role": "Family traveller",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScXbbl8siRgJ3SAhezCz762YBtw2r61vZGpiVMZVHlyA&s=10",
+    "initials": "SW",
+    "quote":
+      "From booking to coming home, the whole experience was smooth. Our family trip felt personal, comfortable, and genuinely special.",
+    "rating": 5
+  } 
+]

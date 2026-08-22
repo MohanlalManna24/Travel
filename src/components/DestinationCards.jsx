@@ -1,6 +1,7 @@
-import React from "react";
+import {useState, useEffect} from "react";
 import { FiClock, FiImage, FiTag } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const DestinationCards = ({
   detailsBasePath = "/destination",
@@ -30,51 +31,42 @@ const DestinationCards = ({
     }
   };
 
+  const[destinationDetails, setDestinationDetails] = useState(null);
+
+  const DESTINATIONS_DETAILS_URL = import.meta.env.VITE_DESTINATIONS_DETAILS_URL;
+  const fetchDestinationDetails = async () => {
+    try { 
+      const response = await axios.get(DESTINATIONS_DETAILS_URL);
+      setDestinationDetails(response.data);
+    } catch (error) {
+      console.error("Error fetching destination details:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDestinationDetails();
+  }, []);
+  console.log(destinationDetails);
+
   const defaultDestinations = [
     {
       id: "destination-1",
-      name: "Paris",
-      location: "Paris, France",
+      name: "Name of Destination",
+      location: "Location",
       description:
-        "Experience Parisian charm, iconic landmarks, beautiful streets, and unforgettable local cuisine.",
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.",
       image:
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS-8XeEWA3EoWb2GUYM5ihW5eV5pWQCcdbPl_a8dOjDw&s=10",
-      pricePerHead: 39999,
+      pricePerHead: "#####",
       days: 4,
       detailsUrl: "/destination/destination-1",
       bookingUrl: "/contact",
-    },
-    {
-      id: "destination-2",
-      name: "Dubai",
-      location: "Dubai, United Arab Emirates",
-      description:
-        "Discover Dubai's futuristic skyline, golden desert adventures, luxury shopping, and vibrant nightlife.",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgVCdmoJTNaY6lKIJsAxKgGNjiOSuHc92AcBz-5ppxyA&s=10",
-      pricePerHead: 59899,
-      days: 5,
-      detailsUrl: "/destination/destination-2",
-      bookingUrl: "/contact",
-    },
-    {
-      id: "destination-3",
-      name: "Goa",
-      location: "Goa, India",
-      description:
-        "Relax on golden beaches, explore Portuguese heritage, and enjoy Goa's lively coastal atmosphere.",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpeeEsr1YK_qI9o5Xp3LNcls6fX_7BKdcnN4CDtVl9LQ&s=10",
-      pricePerHead: 14999,
-      days: 4,
-      detailsUrl: "/destination/destination-3",
-      bookingUrl: "/contact",
-    },
+    }
   ];
   return (
     <div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {defaultDestinations.map((destination) => {
+        {(destinationDetails || defaultDestinations).map((destination) => {
           const {
             id,
             name,
