@@ -1,6 +1,7 @@
 import { FaFacebookF, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import { HiArrowUpRight } from "react-icons/hi2";
 import { FiMail, FiMapPin, FiPhone } from "react-icons/fi";
+import logo from "../../src/assets/icons/logo.png";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -17,8 +18,8 @@ const Footer = () => {
           {/* Brand */}
           <div className="col-span-2 flex flex-col items-left text-left">
             <a href="#" className="group inline-flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br from-cyan-400 to-violet-500 shadow-lg shadow-cyan-500/10 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">
-                <span className="text-xl font-black text-white">T</span>
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl shadow-lg shadow-cyan-500/10 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">
+                <img src={logo} alt="logo"/>
               </div>
 
               <span className="text-2xl font-bold tracking-tight">Travel.</span>
