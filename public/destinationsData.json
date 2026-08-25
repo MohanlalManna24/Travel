@@ -31,5 +31,62 @@
     "days": 4,
     "detailsUrl": "/destination/destination-3",
     "bookingUrl": "/contact"
+  },
+  {
+    "id": "destination-4",
+    "name": "Sunderban",
+    "location": "Sunderban, West Bengal, India",
+    "description": "Discover the world's largest mangrove forest, home to the Royal Bengal Tiger, unique biodiversity, and thrilling boat safaris.",
+    "image": "https://img.magnific.com/premium-photo/scenic-view-lake-forest_118919-686.jpg?w=1500",
+    "pricePerHead": 14999,
+    "days": 3,
+    "detailsUrl": "/destination/destination-4",
+    "bookingUrl": "/contact"
+  },
+  {
+    "id":"destination-5",
+    "name":"Meghalaya",
+    "location":"Meghalaya, India",
+    "description":"Discover the living root bridges, stunning waterfalls, and unique landscapes of Meghalaya.",
+    "image":"https://img.magnific.com/premium-photo/cherrapunji-waterfalls-monsoon-magic-meghalaya_1348488-12330.jpg?w=1500",
+    "pricePerHead":14999,
+    "days":4,
+    "detailsUrl":"/destination/destination-5",
+    "bookingUrl":"/contact"
+  },
+  {
+    "id":"destination-6",
+    "name":"Sikkim",
+    "location":"Sikkim, India",
+    "description":"Discover the living root bridges, stunning waterfalls, and unique landscapes of Sikkim.",
+    "image":"https://img.magnific.com/premium-photo/buddha-park-ravangla_78361-2638.jpg?",
+    "pricePerHead":14999,
+    "days":4,
+    "detailsUrl":"/destination/destination-6",
+    "bookingUrl":"/contact"
+  },
+  {
+    "id":"destination-7",
+    "name":"Thailand",
+    "location":"Thailand",
+    "description":"Discover the serene beauty of Thailand, famous for its stunning beaches, lush green hills, and peaceful atmosphere.",
+    "image":"https://img.magnific.com/free-photo/wat-arun-temple-twilight-bangkok-thailand_335224-772.jpg?t=st=1787416646~exp=1787420246~hmac=7bce563ae2139e88ba106bb9a43050fa2484bee8cde87330109cd6b9840b392c&w=1500",
+    "pricePerHead":52999,
+    "days":10,
+    "detailsUrl":"/destination/destination-7",
+    "bookingUrl":"/contact"
+  },
+  {
+    "id":"destination-8",
+    "name":"Malaysia",
+    "location":"Malaysia",
+    "description":"Discover the serene beauty of Malaysia, famous for its stunning beaches, lush green hills, and peaceful atmosphere.",
+    "image":"https://img.magnific.com/free-photo/view-world-monument-celebrate-world-heritage-day_23-2151297227.jpg?t=st=1787416840~exp=1787420440~hmac=daaccfd898b68811939a22ee6693c3ab98abdc67e412eb03fa1c79b704d6ccf3&w=1500 ",
+    "pricePerHead":57999,
+    "days":12,
+    "detailsUrl":"/destination/destination-8",
+    "bookingUrl":"/contact" 
   }
-]
+  
+  
+] 
