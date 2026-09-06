@@ -15,6 +15,8 @@ import ProfileLayout from "./pages/ProfileLayout.jsx";
 import Overview from "./pages/MyProfile/Overview.jsx";
 import Trips from "./pages/MyProfile/Trips.jsx";
 import ProfileDetails from "./pages/MyProfile/ProfileDetails.jsx";
+import AdminLayout from "./admin/components/AdminLayout.jsx";
+import Dashboard from "./admin/page/Dashboard.jsx";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +44,13 @@ const router = createBrowserRouter([
       { path: "details", element: <ProfileDetails /> },
     ],
   },
+  {
+    path: "admin",
+    element: <AdminLayout/>,
+    children:[
+      {path:"admin",element:<Dashboard/>}
+    ]
+  }
 ]);
 
 createRoot(document.getElementById("root")).render(

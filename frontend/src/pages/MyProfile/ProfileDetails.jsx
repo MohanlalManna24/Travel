@@ -25,7 +25,7 @@ const ProfileDetails = () => {
     dietaryPreference: "",
     medicalNotes: "",
     profileImage:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=320&q=80",
+      "https://mohanlalmanna.vercel.app/assets/profileImg-DNYu86pM.png",
   });
   const [statusMessage, setStatusMessage] = useState("");
 

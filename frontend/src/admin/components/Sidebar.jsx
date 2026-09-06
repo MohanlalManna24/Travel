@@ -2,40 +2,54 @@ import React from "react";
 import { Link, NavLink } from "react-router-dom";
 import { IoMdAdd, IoIosHelpCircleOutline } from "react-icons/io";
 import { PiAirplaneTakeoffLight } from "react-icons/pi";
-import { FaHistory } from "react-icons/fa";
+import { FaHistory, FaRegUser, FaRegAddressCard } from "react-icons/fa";
 import { IoNotificationsOutline, IoSettingsOutline } from "react-icons/io5";
-import { CgProfile } from "react-icons/cg";
 import { RiLogoutCircleLine } from "react-icons/ri";
-import { BsBoxes } from "react-icons/bs";
+import { BsBoxes, BsCashCoin } from "react-icons/bs";
 
 const Sidebar = () => {
   const sidebarItems = [
-    { id: 1, name: "Overview", path: "/profile/overview", icon: <BsBoxes /> },
+    {
+      id: 1,
+      name: " Dashboard Overview",
+      path: "/admin/dashboard",
+      icon: <BsBoxes />,
+    },
     {
       id: 2,
-      name: "Trips",
-      path: "/profile/trips",
+      name: "Trip Management",
+      path: "/admin/trips",
       icon: <PiAirplaneTakeoffLight />,
     },
-    { id: 3, name: "History", path: "/profile/history", icon: <FaHistory /> },
+    {
+      id: 3,
+      name: "Booking Management",
+      path: "/admin/bookings",
+      icon: <FaRegAddressCard />,
+    },
     {
       id: 4,
-      name: "Notification",
-      path: "/profile/notifications",
-      icon: <IoNotificationsOutline />,
+      name: "User Management",
+      path: "/admin/users",
+      icon: <FaRegUser />,
     },
-    { id: 5, name: "Profile", path: "/profile/details", icon: <CgProfile /> },
+    {
+      id: 5,
+      name: "Payment & Revenue",
+      path: "/admin/payments",
+      icon: <BsCashCoin />,
+    },
     {
       id: 6,
-      name: "Settings",
-      path: "/profile/settings",
-      icon: <IoSettingsOutline />,
+      name: "Notification",
+      path: "/admin/notifications",
+      icon: <IoNotificationsOutline />,
     },
     {
       id: 7,
-      name: "Help & Support",
-      path: "/profile/help",
-      icon: <IoIosHelpCircleOutline />,
+      name: "Website settings",
+      path: "/admin/settings",
+      icon: <IoSettingsOutline />,
     },
   ];
   return (
@@ -44,19 +58,19 @@ const Sidebar = () => {
         <section className="mt-5 hidden items-center gap-3 lg:flex">
           <div className="profileImg w-15 h-15 rounded-full overflow-hidden">
             <img
-              src="https://mohanlalmanna.vercel.app/assets/profileImg-DNYu86pM.png"
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQxZjvZuCyMCf_mS8zJbA8snsYQ90twlnVsAu3zsX-jg&s=10"
               alt="Profile"
               className="object-cover w-full h-full"
             />
           </div>
           <div className="">
-            <h1 className="text-2xl font-bold">Mohanlal</h1>
-            <p className="text-[12px]">Premium Traveler</p>
+            <h1 className="text-2xl font-bold text-center">Mohanlal</h1>
+            <p className="text-[12px]">Administrator</p>
           </div>
         </section>
         {/* <div className="w-full h-0.5 mt-5 bg-gray-300"></div> */}
         <button className="mt-5 hidden w-full items-center justify-center gap-2 rounded-lg bg-[#073b4c] px-4 py-2 text-white hover:bg-[#021f17] hover:text-[#b3e8f9] cursor-pointer lg:flex">
-          <IoMdAdd /> Book New Trip
+          <IoMdAdd /> Add New Trip
         </button>
         <div className="action h-full lg:h-auto">
           <ul className="flex h-full items-center justify-around gap-1 px-2 lg:block lg:h-auto lg:px-0">
@@ -91,7 +105,7 @@ const Sidebar = () => {
             ))}
           </ul>
         </div>
-        <section className="absolute bottom-5 left-0 hidden w-full px-6 lg:block">
+        <section className="absolute bottom-10 left-0 hidden w-full px-6 lg:block">
           <Link to="/">
             <button className="flex items-center justify-center gap-2 border-2 border-amber-500 p-2 px-15 rounded-xl hover:bg-amber-600 cursor-pointer">
               <RiLogoutCircleLine />
