@@ -18,6 +18,7 @@ import ProfileDetails from "./pages/MyProfile/ProfileDetails.jsx";
 import AdminLayout from "./admin/components/AdminLayout.jsx";
 import Dashboard from "./admin/page/Dashboard.jsx";
 import TripManagement from "./admin/page/TripManagement.jsx";
+import UserManagement from "./admin/page/UserManagement.jsx";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,7 @@ const router = createBrowserRouter([
       { index: true, element: <Dashboard /> },
       { path: "dashboard", element: <Dashboard /> },
       { path: "trips", element: <TripManagement /> },
+      { path: "users", element: <UserManagement /> },
       { path: "*", element: <Dashboard /> },
     ],
   },
