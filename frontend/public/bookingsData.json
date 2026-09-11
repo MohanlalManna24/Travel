@@ -1,0 +1,210 @@
+[
+  {
+    "id": "BKG-98401",
+    "customer": {
+      "name": "Mohanlal Manna",
+      "email": "mohanlal.manna@ghureashi.com",
+      "phone": "+91 98765 43210",
+      "avatar": "https://mohanlalmanna.vercel.app/assets/profileImg-DNYu86pM.png",
+      "city": "Kolkata, India"
+    },
+    "destination": {
+      "id": "destination-1",
+      "name": "Paris Grand Escape",
+      "location": "Paris, France",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS-8XeEWA3EoWb2GUYM5ihW5eV5pWQCcdbPl_a8dOjDw&s=10"
+    },
+    "startDate": "2026-10-15",
+    "endDate": "2026-10-19",
+    "guests": 2,
+    "totalAmount": 79998,
+    "paymentStatus": "Paid",
+    "paymentMethod": "Credit Card (Mastercard)",
+    "transactionId": "TXN-88492019",
+    "bookingStatus": "Confirmed",
+    "specialNotes": "Window seat preferred. Honeymoon package requested with champagne welcome.",
+    "createdAt": "2026-09-08T14:30:00Z"
+  },
+  {
+    "id": "BKG-98402",
+    "customer": {
+      "name": "Aarav Sharma",
+      "email": "aarav.sharma@gmail.com",
+      "phone": "+91 98234 11223",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=256&auto=format&fit=crop",
+      "city": "Mumbai, India"
+    },
+    "destination": {
+      "id": "destination-2",
+      "name": "Dubai Royal Safari",
+      "location": "Dubai, United Arab Emirates",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgVCdmoJTNaY6lKIJsAxKgGNjiOSuHc92AcBz-5ppxyA&s=10"
+    },
+    "startDate": "2026-11-02",
+    "endDate": "2026-11-07",
+    "guests": 3,
+    "totalAmount": 179697,
+    "paymentStatus": "Paid",
+    "paymentMethod": "UPI / NetBanking",
+    "transactionId": "TXN-77382910",
+    "bookingStatus": "Confirmed",
+    "specialNotes": "Vegetarian meal preference for all 3 guests.",
+    "createdAt": "2026-09-09T10:15:00Z"
+  },
+  {
+    "id": "BKG-98403",
+    "customer": {
+      "name": "Sophia Vance",
+      "email": "sophia.vance@wanderer.io",
+      "phone": "+44 7911 123456",
+      "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
+      "city": "London, UK"
+    },
+    "destination": {
+      "id": "destination-4",
+      "name": "Sunderban Tiger Trail",
+      "location": "Sunderban, West Bengal, India",
+      "image": "https://img.magnific.com/premium-photo/scenic-view-lake-forest_118919-686.jpg?w=1500"
+    },
+    "startDate": "2026-10-28",
+    "endDate": "2026-10-31",
+    "guests": 1,
+    "totalAmount": 14999,
+    "paymentStatus": "Pending",
+    "paymentMethod": "Bank Transfer",
+    "transactionId": "TXN-PENDING-04",
+    "bookingStatus": "Pending",
+    "specialNotes": "Wildlife photography guide needed.",
+    "createdAt": "2026-09-11T08:20:00Z"
+  },
+  {
+    "id": "BKG-98404",
+    "customer": {
+      "name": "Rohan Deshmukh",
+      "email": "rohan.deshmukh@outlook.com",
+      "phone": "+91 97654 32109",
+      "avatar": "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?q=80&w=256&auto=format&fit=crop",
+      "city": "Pune, India"
+    },
+    "destination": {
+      "id": "destination-3",
+      "name": "Goa Coastal Serenity",
+      "location": "Goa, India",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpeeEsr1YK_qI9o5Xp3LNcls6fX_7BKdcnN4CDtVl9LQ&s=10"
+    },
+    "startDate": "2026-09-20",
+    "endDate": "2026-09-24",
+    "guests": 4,
+    "totalAmount": 59996,
+    "paymentStatus": "Paid",
+    "paymentMethod": "Credit Card (Visa)",
+    "transactionId": "TXN-99120491",
+    "bookingStatus": "Completed",
+    "specialNotes": "Late checkout requested for 2 rooms.",
+    "createdAt": "2026-08-15T12:00:00Z"
+  },
+  {
+    "id": "BKG-98405",
+    "customer": {
+      "name": "Elena Rostova",
+      "email": "elena.rostova@travelglobe.com",
+      "phone": "+33 6 12 34 56 78",
+      "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop",
+      "city": "Paris, France"
+    },
+    "destination": {
+      "id": "destination-5",
+      "name": "Meghalaya Living Bridges",
+      "location": "Meghalaya, India",
+      "image": "https://img.magnific.com/premium-photo/cherrapunji-waterfalls-monsoon-magic-meghalaya_1348488-12330.jpg?w=1500"
+    },
+    "startDate": "2026-11-10",
+    "endDate": "2026-11-14",
+    "guests": 2,
+    "totalAmount": 29998,
+    "paymentStatus": "Paid",
+    "paymentMethod": "Apple Pay",
+    "transactionId": "TXN-55443322",
+    "bookingStatus": "Confirmed",
+    "specialNotes": "English speaking local trekking guide required.",
+    "createdAt": "2026-09-10T16:45:00Z"
+  },
+  {
+    "id": "BKG-98406",
+    "customer": {
+      "name": "Vikramaditya Roy",
+      "email": "vikram.roy@bangalorehub.org",
+      "phone": "+91 94321 87654",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=256&auto=format&fit=crop",
+      "city": "Bengaluru, India"
+    },
+    "destination": {
+      "id": "destination-6",
+      "name": "Sikkim Himalayan Majesty",
+      "location": "Sikkim, India",
+      "image": "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80&w=800&auto=format&fit=crop"
+    },
+    "startDate": "2026-10-05",
+    "endDate": "2026-10-10",
+    "guests": 2,
+    "totalAmount": 37998,
+    "paymentStatus": "Refunded",
+    "paymentMethod": "UPI / GPay",
+    "transactionId": "TXN-REF-11029",
+    "bookingStatus": "Cancelled",
+    "specialNotes": "Trip cancelled due to personal emergency. Refund processed.",
+    "createdAt": "2026-09-01T09:10:00Z"
+  },
+  {
+    "id": "BKG-98407",
+    "customer": {
+      "name": "Kenji Takahashi",
+      "email": "kenji.takahashi@tokyotravel.jp",
+      "phone": "+81 90 1234 5678",
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=256&auto=format&fit=crop",
+      "city": "Tokyo, Japan"
+    },
+    "destination": {
+      "id": "destination-1",
+      "name": "Paris Grand Escape",
+      "location": "Paris, France",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS-8XeEWA3EoWb2GUYM5ihW5eV5pWQCcdbPl_a8dOjDw&s=10"
+    },
+    "startDate": "2026-12-20",
+    "endDate": "2026-12-25",
+    "guests": 2,
+    "totalAmount": 79998,
+    "paymentStatus": "Paid",
+    "paymentMethod": "Credit Card (Amex)",
+    "transactionId": "TXN-88331199",
+    "bookingStatus": "Confirmed",
+    "specialNotes": "Christmas dinner reservation requested.",
+    "createdAt": "2026-09-05T18:30:00Z"
+  },
+  {
+    "id": "BKG-98408",
+    "customer": {
+      "name": "Priya Sen",
+      "email": "priya.sen@heritagevoyages.in",
+      "phone": "+91 98300 12345",
+      "avatar": "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=256&auto=format&fit=crop",
+      "city": "Kolkata, India"
+    },
+    "destination": {
+      "id": "destination-3",
+      "name": "Goa Coastal Serenity",
+      "location": "Goa, India",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpeeEsr1YK_qI9o5Xp3LNcls6fX_7BKdcnN4CDtVl9LQ&s=10"
+    },
+    "startDate": "2026-11-15",
+    "endDate": "2026-11-19",
+    "guests": 2,
+    "totalAmount": 29998,
+    "paymentStatus": "Pending",
+    "paymentMethod": "NetBanking",
+    "transactionId": "TXN-PENDING-08",
+    "bookingStatus": "Pending",
+    "specialNotes": "Airport pickup required at Dabolim Airport.",
+    "createdAt": "2026-09-11T11:00:00Z"
+  }
+]

@@ -19,6 +19,7 @@ import AdminLayout from "./admin/components/AdminLayout.jsx";
 import Dashboard from "./admin/page/Dashboard.jsx";
 import TripManagement from "./admin/page/TripManagement.jsx";
 import UserManagement from "./admin/page/UserManagement.jsx";
+import BookingManagement from "./admin/page/BookingManagement.jsx";
 
 const router = createBrowserRouter([
   {
@@ -55,6 +56,7 @@ const router = createBrowserRouter([
       { path: "dashboard", element: <Dashboard /> },
       { path: "trips", element: <TripManagement /> },
       { path: "users", element: <UserManagement /> },
+      { path: "bookings", element: <BookingManagement /> },
       { path: "*", element: <Dashboard /> },
     ],
   },
