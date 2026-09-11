@@ -58,7 +58,8 @@ const Dashboard = () => {
             Welcome to Ghure Ashi Travel Center
           </h2>
           <p className="mt-2 text-sm text-slate-300">
-            Monitor real-time bookings, curate bespoke travel itineraries, and track financial growth across all regions.
+            Monitor real-time bookings, curate bespoke travel itineraries, and
+            track financial growth across all regions.
           </p>
         </div>
       </div>
