@@ -57,7 +57,7 @@ export const NotificationBell = ({ count = 3, onClick }) => {
     >
       <HiOutlineBell className="text-xl transition-transform duration-300 group-hover:rotate-12 group-hover:text-cyan-600" />
       {count > 0 && (
-        <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-gradient-to-tr from-cyan-600 to-blue-600 text-[10px] font-bold text-white shadow-xs">
+        <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-linear-to-tr from-cyan-600 to-blue-600 text-[10px] font-bold text-white shadow-xs">
           {count > 9 ? "9+" : count}
         </span>
       )}
@@ -100,7 +100,7 @@ export const UserProfileBadge = ({
 
         <div className="hidden flex-col text-left sm:flex">
           <div className="flex items-center gap-1">
-            <span className="max-w-[120px] truncate text-xs font-bold text-slate-800">
+            <span className="max-w-30 truncate text-xs font-bold text-slate-800">
               {user.name}
             </span>
             <HiOutlineSparkles className="text-xs text-amber-500" />
