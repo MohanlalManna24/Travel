@@ -130,7 +130,7 @@ const DesktopNavItem = ({ item, isActive }) => {
     <li>
       <NavLink
         to={item.path}
-        className={`group relative flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200 ${
+        className={`group relative flex items-center justify-between rounded-xl px-3.5 py-3.5 text-sm font-medium transition-all duration-200 ${
           isActive
             ? "border-l-3 border-cyan-400 bg-linear-to-r from-cyan-500/20 via-blue-500/10 to-transparent pl-3 font-semibold text-white shadow-xs"
             : "text-slate-400 hover:translate-x-1 hover:bg-slate-900/80 hover:text-slate-100"
@@ -142,7 +142,7 @@ const DesktopNavItem = ({ item, isActive }) => {
         )}
 
         {/* Icon & Label */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <Icon
             className={`text-lg transition-all duration-300 ${
               isActive
@@ -190,7 +190,9 @@ const MobileNavItem = ({ item, isActive }) => {
             isActive ? "scale-110 text-cyan-400" : ""
           }`}
         />
-        <span className="scale-90 tracking-tight">{item.shortLabel || item.name}</span>
+        <span className="scale-90 tracking-tight">
+          {item.shortLabel || item.name}
+        </span>
       </NavLink>
     </li>
   );
@@ -206,7 +208,11 @@ const Sidebar = () => {
   const isLinkActive = (path, altPaths = []) => {
     if (location.pathname === path) return true;
     if (altPaths.includes(location.pathname)) return true;
-    if (path !== "/admin" && path !== "/admin/dashboard" && location.pathname.startsWith(path)) {
+    if (
+      path !== "/admin" &&
+      path !== "/admin/dashboard" &&
+      location.pathname.startsWith(path)
+    ) {
       return true;
     }
     return false;
@@ -233,9 +239,16 @@ const Sidebar = () => {
               to="/admin/dashboard"
               className="group flex items-center gap-3 transition-transform duration-300 hover:scale-[1.02]"
             >
-              <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-linear-to-tr from-cyan-600 via-blue-600 to-indigo-600 p-2 shadow-lg shadow-cyan-500/25 ring-1 ring-white/20 transition-all duration-300 group-hover:shadow-cyan-500/40">
-                <img src={logo} alt="Logo" className="h-full w-full object-contain" />
-                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+              <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-linear-to-tr from-cyan-600 via-sky-600 via-yellow-100 to-indigo-600 p-2 shadow-lg shadow-cyan-500/25 ring-1 ring-white/20 transition-all duration-300 group-hover:shadow-cyan-500/40">
+                <img
+                  src={logo}
+                  alt="Logo"
+                  className="h-full w-full object-cover"
+                />
+                <span
+                  className="absolute -bottom-1 -right-1 flex h-3 w-3 items-center justify-center"
+                  aria-label="System status: online"
+                >
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex h-3 w-3 rounded-full border-2 border-slate-950 bg-emerald-500" />
                 </span>
@@ -269,7 +282,10 @@ const Sidebar = () => {
         {/* Middle Navigation Menu with Custom Scrollbar */}
         <div className="relative z-10 flex-1 overflow-y-auto px-4 py-2 scrollbar-thin scrollbar-thumb-slate-800 hover:scrollbar-thumb-slate-700">
           {ADMIN_NAV_GROUPS.map((group, groupIdx) => (
-            <div key={group.groupTitle} className={groupIdx > 0 ? "mt-5" : "mt-2"}>
+            <div
+              key={group.groupTitle}
+              className={groupIdx > 0 ? "mt-5" : "mt-2"}
+            >
               <h4 className="px-3 pb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">
                 {group.groupTitle}
               </h4>
@@ -299,7 +315,7 @@ const Sidebar = () => {
 
           {/* Status & Version Footer */}
           <div className="flex items-center justify-between px-1 pt-1 text-[10px] text-slate-400">
-            <span>Voyage CMS v2.4</span>
+            <span>Ghure Ashi v1.0</span>
             <span className="flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
               All systems live

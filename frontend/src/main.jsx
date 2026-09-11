@@ -17,6 +17,7 @@ import Trips from "./pages/MyProfile/Trips.jsx";
 import ProfileDetails from "./pages/MyProfile/ProfileDetails.jsx";
 import AdminLayout from "./admin/components/AdminLayout.jsx";
 import Dashboard from "./admin/page/Dashboard.jsx";
+import TripManagement from "./admin/page/TripManagement.jsx";
 
 const router = createBrowserRouter([
   {
@@ -51,6 +52,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Dashboard /> },
       { path: "dashboard", element: <Dashboard /> },
+      { path: "trips", element: <TripManagement /> },
       { path: "*", element: <Dashboard /> },
     ],
   },

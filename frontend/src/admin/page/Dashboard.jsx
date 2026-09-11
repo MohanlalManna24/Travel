@@ -55,7 +55,7 @@ const Dashboard = () => {
             Global Travel Intelligence
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            Welcome to Voyage Command Center
+            Welcome to Ghure Ashi Travel Center
           </h2>
           <p className="mt-2 text-sm text-slate-300">
             Monitor real-time bookings, curate bespoke travel itineraries, and track financial growth across all regions.
