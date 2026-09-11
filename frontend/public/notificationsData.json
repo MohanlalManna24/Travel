@@ -1,0 +1,144 @@
+[
+  {
+    "id": "NOTIF-701",
+    "title": "Custom Honeymoon Package Inquiry",
+    "message": "Hi Admin, we are planning a 5-day honeymoon trip to Paris in late October. Can you customize a candlelit Seine river cruise and private Louvre guide for 2 guests? Please text or email the quotation.",
+    "category": "Inquiry",
+    "priority": "High",
+    "isRead": false,
+    "user": {
+      "name": "Aarav Sharma",
+      "email": "aarav.sharma@gmail.com",
+      "phone": "+91 98234 11223",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=256&auto=format&fit=crop",
+      "role": "VIP Traveler"
+    },
+    "relatedEntity": {
+      "type": "Trip",
+      "id": "destination-1",
+      "name": "Paris Grand Escape"
+    },
+    "feedbackReply": null,
+    "createdAt": "2026-09-11T16:45:00Z"
+  },
+  {
+    "id": "NOTIF-702",
+    "title": "Vegetarian Meal & Airport Transfer Request",
+    "message": "Booking #BKG-98402: Please confirm if vegetarian Jain meals are arranged on the Dubai Desert Safari. Also need airport pick-up at Dubai International Terminal 3.",
+    "category": "Booking",
+    "priority": "High",
+    "isRead": false,
+    "user": {
+      "name": "Sophia Vance",
+      "email": "sophia.vance@wanderer.io",
+      "phone": "+44 7911 123456",
+      "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop",
+      "role": "Explorer"
+    },
+    "relatedEntity": {
+      "type": "Booking",
+      "id": "BKG-98402",
+      "name": "Dubai Royal Safari"
+    },
+    "feedbackReply": null,
+    "createdAt": "2026-09-11T14:10:00Z"
+  },
+  {
+    "id": "NOTIF-703",
+    "title": "Wonderful Experience in Meghalaya! ⭐⭐⭐⭐⭐",
+    "message": "The living root bridges and Cherrapunji waterfalls tour was out of this world! Our guide was extremely knowledgeable and polite. Thank you Ghure Ashi team for making our family vacation unforgettable!",
+    "category": "Feedback",
+    "priority": "Medium",
+    "isRead": true,
+    "user": {
+      "name": "Elena Rostova",
+      "email": "elena.rostova@travelglobe.com",
+      "phone": "+33 6 12 34 56 78",
+      "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop",
+      "role": "VIP Traveler"
+    },
+    "relatedEntity": {
+      "type": "Trip",
+      "id": "destination-5",
+      "name": "Meghalaya Living Bridges"
+    },
+    "feedbackReply": {
+      "sentAt": "2026-09-11T15:00:00Z",
+      "channel": "Email & SMS",
+      "subject": "Thank you for your heartwarming feedback!",
+      "message": "Dear Elena, thank you so much for your kind words! We have credited 500 Loyalty Bonus Points to your Ghure Ashi VIP account."
+    },
+    "createdAt": "2026-09-11T11:20:00Z"
+  },
+  {
+    "id": "NOTIF-704",
+    "title": "Refund Confirmation Required (Sikkim Expedition)",
+    "message": "I submitted a cancellation request for booking #BKG-98406 due to a medical emergency. Kindly confirm if the refund of ₹37,998 has been cleared by your bank.",
+    "category": "Support",
+    "priority": "High",
+    "isRead": false,
+    "user": {
+      "name": "Vikramaditya Roy",
+      "email": "vikram.roy@bangalorehub.org",
+      "phone": "+91 94321 87654",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=256&auto=format&fit=crop",
+      "role": "Explorer"
+    },
+    "relatedEntity": {
+      "type": "Refund",
+      "id": "TXN-REF-11029",
+      "name": "Sikkim Himalayan Majesty"
+    },
+    "feedbackReply": null,
+    "createdAt": "2026-09-10T19:00:00Z"
+  },
+  {
+    "id": "NOTIF-705",
+    "title": "Corporate Group Tour Discount Inquiry (30 Guests)",
+    "message": "We are looking to organize an annual corporate retreat in Goa for 30 executives in mid-November. Do you offer B2B bulk discounts and conference hall arrangements?",
+    "category": "Inquiry",
+    "priority": "Medium",
+    "isRead": true,
+    "user": {
+      "name": "Rohan Deshmukh",
+      "email": "rohan.deshmukh@outlook.com",
+      "phone": "+91 97654 32109",
+      "avatar": "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?q=80&w=256&auto=format&fit=crop",
+      "role": "Tour Agent"
+    },
+    "relatedEntity": {
+      "type": "Trip",
+      "id": "destination-3",
+      "name": "Goa Coastal Serenity"
+    },
+    "feedbackReply": {
+      "sentAt": "2026-09-11T09:30:00Z",
+      "channel": "Email & SMS",
+      "subject": "Ghure Ashi Corporate Escape Quotation",
+      "message": "Hello Rohan, our B2B team has generated a customized brochure with 18% corporate discount and 5-star conference amenities."
+    },
+    "createdAt": "2026-09-10T15:30:00Z"
+  },
+  {
+    "id": "NOTIF-706",
+    "title": "Automated System Security Audit Completed",
+    "message": "Routine monthly SSL certificate verification and secure database backup finished with 100% integrity. All API endpoints active.",
+    "category": "System",
+    "priority": "Low",
+    "isRead": true,
+    "user": {
+      "name": "Ghure Ashi Sentinel",
+      "email": "security@ghureashi.com",
+      "phone": "+91 98000 00000",
+      "avatar": "https://mohanlalmanna.vercel.app/assets/profileImg-DNYu86pM.png",
+      "role": "System Bot"
+    },
+    "relatedEntity": {
+      "type": "System",
+      "id": "SEC-AUDIT-2026",
+      "name": "Automated Core Security"
+    },
+    "feedbackReply": null,
+    "createdAt": "2026-09-09T02:00:00Z"
+  }
+]

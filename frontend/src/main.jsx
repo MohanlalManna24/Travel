@@ -20,6 +20,7 @@ import Dashboard from "./admin/page/Dashboard.jsx";
 import TripManagement from "./admin/page/TripManagement.jsx";
 import UserManagement from "./admin/page/UserManagement.jsx";
 import BookingManagement from "./admin/page/BookingManagement.jsx";
+import Notification from "./admin/page/Notification.jsx";
 
 const router = createBrowserRouter([
   {
@@ -57,6 +58,7 @@ const router = createBrowserRouter([
       { path: "trips", element: <TripManagement /> },
       { path: "users", element: <UserManagement /> },
       { path: "bookings", element: <BookingManagement /> },
+      { path: "notifications", element: <Notification /> },
       { path: "*", element: <Dashboard /> },
     ],
   },
