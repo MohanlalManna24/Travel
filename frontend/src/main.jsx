@@ -42,15 +42,18 @@ const router = createBrowserRouter([
       { path: "trips", element: <Trips /> },
       { path: "trips/:destinationId", element: <DetailsDestination /> },
       { path: "details", element: <ProfileDetails /> },
+      { path: "*", element: <Overview /> },
     ],
   },
   {
-    path: "admin",
-    element: <AdminLayout/>,
-    children:[
-      {path:"admin",element:<Dashboard/>}
-    ]
-  }
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [
+      { index: true, element: <Dashboard /> },
+      { path: "dashboard", element: <Dashboard /> },
+      { path: "*", element: <Dashboard /> },
+    ],
+  },
 ]);
 
 createRoot(document.getElementById("root")).render(
