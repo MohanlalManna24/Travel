@@ -38,10 +38,14 @@ const DestinationCards = ({
   const fetchDestinationDetails = async () => {
     try { 
       const response = await axios.get(DESTINATIONS_DETAILS_URL);
+      if (!Array.isArray(response.data)) {
+        throw new Error("Invalid destinations response format");
+      }
       const data = limit ? response.data.slice(0, limit) : response.data;
       setDestinationDetails(data);
     } catch (error) {
       console.error("Error fetching destination details:", error);
+      setDestinationDetails(null);
     }
   };
 
