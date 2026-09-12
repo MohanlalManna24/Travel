@@ -9,7 +9,7 @@ import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 
 const Navbar = () => {
-  const [isLogin, setIsLogin] = useState(true); // Replace with actual login state from your authentication logic
+  const [isLogin, setIsLogin] = useState(false); // Replace with actual login state from your authentication logic
 
   const menuItems = [
     { name: "Home", to: "/" },

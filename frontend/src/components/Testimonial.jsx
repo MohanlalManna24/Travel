@@ -18,8 +18,7 @@ const defaultTestimonials = [
 ];
 
 const Testimonial = () => {
-
-   const [testimonials, setTestimonials] = useState(defaultTestimonials);
+  const [testimonials, setTestimonials] = useState(defaultTestimonials);
 
   const TESIMONIAL_URL= import.meta.env.VITE_TESTIMONIAL_URL;
    useEffect(() => {
