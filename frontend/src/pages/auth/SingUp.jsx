@@ -4,7 +4,8 @@ import { FaFacebook } from "react-icons/fa6";
 import { FaLock } from "react-icons/fa";
 import { IoMdPerson, IoIosArrowRoundForward } from "react-icons/io";
 import { IoMail } from "react-icons/io5";
-import { FaEye, FaEyeSlash  } from "react-icons/fa";
+import { MdOutlinePhoneAndroid } from "react-icons/md";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import travelIllustration from "../../assets/images/img1.jpg";
 import { Link } from "react-router-dom";
 
@@ -22,11 +23,11 @@ const SingUp = () => {
       ...prevData,
       [name]: value,
     }));
-  }
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
-  }
+  };
 
   return (
     <main className="min-h-[calc(100vh-5rem)] bg-[#f5f3ed] px-4 py-8 sm:px-6 lg:px-10">
@@ -57,7 +58,7 @@ const SingUp = () => {
             </p>
           </div>
         </div>
-        <section className="px-6 py-10 sm:px-12 sm:py-14 lg:px-16 lg:py-20">
+        <section className="px-6 py-5 sm:px-12 sm:py-14 lg:px-16 lg:py-10">
           <div className="mb-10">
             <p className="mb-3 text-xs font-bold tracking-[0.28em] text-[#db8a3c] uppercase">
               Start your journey
@@ -103,6 +104,21 @@ const SingUp = () => {
               </span>
             </label>
             <label className="block text-sm font-semibold text-[#284b4c]">
+              Phone number
+              <span className="relative mt-2 block">
+                <MdOutlinePhoneAndroid className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg text-[#8aa3a0]" />
+                <input
+                  className="h-13 w-full rounded-xl border border-[#d8e2df] bg-[#fbfcfa] pl-12 pr-4 text-sm text-[#183b3d] outline-none transition placeholder:text-[#a7b5b3] focus:border-[#2f7773] focus:ring-4 focus:ring-[#2f7773]/10"
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  value={formData.phone}
+                  name="phone"
+                  onChange={handleInputChange}
+                  required
+                />
+              </span>
+            </label>
+            <label className="block text-sm font-semibold text-[#284b4c]">
               Password
               <span className="relative mt-2 flex items-center">
                 <FaLock className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#8aa3a0]" />
@@ -114,7 +130,17 @@ const SingUp = () => {
                   name="password"
                   onChange={handleInputChange}
                 />
-                {showPassword? <FaEye className="text-2xl -ml-10 cursor-pointer" onClick={() => setShowPassword(false)}/> : <FaEyeSlash className="text-2xl -ml-10 cursor-pointer" onClick={() => setShowPassword(true)}/>}
+                {showPassword ? (
+                  <FaEye
+                    className="text-2xl -ml-10 cursor-pointer"
+                    onClick={() => setShowPassword(false)}
+                  />
+                ) : (
+                  <FaEyeSlash
+                    className="text-2xl -ml-10 cursor-pointer"
+                    onClick={() => setShowPassword(true)}
+                  />
+                )}
               </span>
             </label>
             <button
@@ -146,10 +172,13 @@ const SingUp = () => {
           </div>
           <p className="mt-8 text-center text-sm text-[#687878]">
             Already have an account?
-            <Link to="/auth/signin" className="font-bold text-[#2f7773] cursor-pointer">
-            <span className="font-bold text-[#2f7773] cursor-pointer">
-              Sign in
-            </span>
+            <Link
+              to="/auth/signin"
+              className="font-bold text-[#2f7773] cursor-pointer"
+            >
+              <span className="font-bold text-[#2f7773] cursor-pointer">
+                Sign in
+              </span>
             </Link>
           </p>
         </section>
