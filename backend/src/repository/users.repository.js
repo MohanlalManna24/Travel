@@ -36,3 +36,23 @@ export const checkUserExist = async (email) => {
   );
   return rows.length > 0;
 };
+
+//5. Update user by id
+export const updateUserById = async (id, user) => {
+  const { fullname, email, phone, password } = user;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const [result] = await pool.query(
+    "UPDATE USERS SET fullname = ?, email = ?, phone = ?, password = ? WHERE id = ?",
+    [fullname, email, phone, hashedPassword, id]
+  );
+  return result.affectedRows > 0;
+};
+
+//6. Delete user by id
+export const deleteUserById = async (id) => {
+  const [result] = await pool.query(
+    "DELETE FROM USERS WHERE id = ?",
+    [id]
+  );
+  return result.affectedRows > 0;
+};

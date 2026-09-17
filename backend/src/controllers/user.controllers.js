@@ -3,6 +3,8 @@ import {
   getUserById as selectUserById,
   checkUserExist as checkUserExists,
   createUser as createNewUser,
+  updateUserById as updateuserById,
+  deleteUserById as deleteuserById,
 } from "../repository/users.repository.js";
 
 import { validationResult } from "express-validator";
@@ -50,6 +52,47 @@ export const createUser = async (req, res) => {
     res
       .status(201)
       .json({ message: "User created successfully", user: newUser });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+//4. Update user by ID
+//====================================================
+export const updateUserById = async (req, res) => {
+  const { id } = req.params;
+  const { fullname, email, phone, password } = req.body;
+
+  try {
+    const updatedUser = await updateuserById(id, {
+      fullname,
+      email,
+      phone,
+      password,
+    });
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res
+      .status(200)
+      .json({ message: "User updated successfully", user: updatedUser });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+//5. Delete user by ID
+//====================================================
+export const deleteUserById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deletedUser = await deleteuserById(id);
+    if (!deletedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res
+      .status(200)
+      .json({ message: "User deleted successfully", user: deletedUser });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
