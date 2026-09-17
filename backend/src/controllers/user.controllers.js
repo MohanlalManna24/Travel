@@ -5,6 +5,7 @@ import {
   createUser as createNewUser,
   updateUserById as updateuserById,
   deleteUserById as deleteuserById,
+  deleteAllUsers as deleteAllusers,
 } from "../repository/users.repository.js";
 
 import { validationResult } from "express-validator";
@@ -15,6 +16,9 @@ import { validationResult } from "express-validator";
 export const getAllUsers = async (req, res) => {
   try {
     const users = await selectAllUsers();
+    if (!users || users.length === 0) {
+      return res.status(404).json({ error: "No users found" });
+    }
     res.status(200).json({ massage: "users resive successfully", users });
   } catch (error) {
     res.status(500).json({ error: error.massage });
@@ -93,6 +97,20 @@ export const deleteUserById = async (req, res) => {
     res
       .status(200)
       .json({ message: "User deleted successfully", user: deletedUser });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const deleteAllUsers = async (req, res) => {
+  try {
+    const deleted = await deleteAllusers();
+
+    if (!deleted) {
+      return res.status(404).json({ error: "No users found to delete" });
+    }
+
+    res.status(200).json({ message: "All users deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -14,7 +14,7 @@ export const getUserById = async (id) => {
   const [rows] = await pool.query(
     "SELECT id, fullname, email, phone FROM USERS where id = ?",[id]
   );
-  return rows;
+  return rows[0];
 };
 
 //3. Create users
@@ -54,5 +54,11 @@ export const deleteUserById = async (id) => {
     "DELETE FROM USERS WHERE id = ?",
     [id]
   );
+  return result.affectedRows > 0;
+};
+
+//7.delete all users
+export const deleteAllUsers = async () => {
+  const [result] = await pool.query("DELETE FROM USERS");
   return result.affectedRows > 0;
 };

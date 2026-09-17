@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllUsers,getUserById, createUser, updateUserById, deleteUserById } from "../controllers/user.controllers.js";
+import { getAllUsers,getUserById, createUser, updateUserById, deleteUserById,deleteAllUsers } from "../controllers/user.controllers.js";
 import studentValidation from "../middleware/studentValidation.js";
 
 const router = express.Router();
@@ -33,6 +33,12 @@ router.put("/updateuser/:id", studentValidation, updateUserById);
  * @route   DELETE /api/users/deleteuser/:id
  */
 router.delete("/deleteuser/:id", deleteUserById);
+
+/*
+ * @desc    Delete all users
+ * @route   DELETE /api/users/deleteall
+ */
+router.delete("/deleteall", deleteAllUsers);
 
 
 
