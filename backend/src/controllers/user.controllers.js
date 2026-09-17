@@ -5,6 +5,8 @@ import {
   createUser as createNewUser,
 } from "../repository/users.repository.js";
 
+import { validationResult } from "express-validator";
+
 //1. Get all users
 //====================================================
 
@@ -33,8 +35,12 @@ export const getUserById = async (req, res) => {
 //====================================================
 
 export const createUser = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   const { fullname, email, phone, password } = req.body;
-  
+
   const userExists = await checkUserExists(email);
   if (userExists) {
     return res.status(400).json({ error: "User already exists" });

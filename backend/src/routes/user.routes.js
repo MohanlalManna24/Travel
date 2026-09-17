@@ -1,5 +1,6 @@
 import express from "express";
 import { getAllUsers,getUserById, createUser } from "../controllers/user.controllers.js";
+import studentValidation from "../middleware/studentValidation.js";
 
 const router = express.Router();
 
@@ -19,7 +20,7 @@ router.get("/:id", getUserById);
  * @desc    Create a new user
  * @route   POST /api/users/createuser
  */
-router.post("/createuser", createUser);
+router.post("/createuser", studentValidation, createUser);
 
 
 

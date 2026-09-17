@@ -1,4 +1,5 @@
 import pool from "../db/db.js";
+import bcrypt from "bcrypt";
 
 //1. Get all users
 export const getAllUsers = async () => {
@@ -19,11 +20,12 @@ export const getUserById = async (id) => {
 //3. Create users
 export const createUser = async (user) => {
   const { fullname, email, phone, password } = user;
+  const hashedPassword = await bcrypt.hash(password, 10);
   const [result] = await pool.query(
     "INSERT INTO USERS(fullname, email, phone, password) VALUE(?,?,?,?)",
-    [fullname, email, phone, password],
+    [fullname, email, phone, hashedPassword],
   );
-  return result;
+  return { id: result.insertId, fullname, email, phone };
 };
 
 //4. Check if user already exist
