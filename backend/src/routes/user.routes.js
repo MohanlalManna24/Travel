@@ -1,6 +1,6 @@
 import express from "express";
 import { getAllUsers,getUserById, createUser, updateUserById, deleteUserById,deleteAllUsers } from "../controllers/user.controllers.js";
-import studentValidation from "../middleware/studentValidation.js";
+import userValidation from "../middleware/userValidation.js";
 
 const router = express.Router();
 
@@ -20,13 +20,13 @@ router.get("/:id", getUserById);
  * @desc    Create a new user
  * @route   POST /api/users/createuser
  */
-router.post("/createuser", studentValidation, createUser);
+router.post("/createuser", userValidation, createUser);
 
 /*
  * @desc    Update user by ID
  * @route   PUT /api/users/updateuser/:id
  */
-router.put("/updateuser/:id", studentValidation, updateUserById);
+router.put("/updateuser/:id", userValidation, updateUserById);
 
 /*
  * @desc    Delete user by ID

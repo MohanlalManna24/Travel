@@ -1,6 +1,6 @@
 import { body } from "express-validator";
 
-const studentValidation = [
+const userValidation = [
   body("fullname")
     .trim()
     .notEmpty()
@@ -27,4 +27,4 @@ const studentValidation = [
     .withMessage("Password must be at least 6 characters long"),
 ];
 
-export default studentValidation;
+export default userValidation;
