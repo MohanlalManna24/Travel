@@ -1,5 +1,10 @@
 import express from "express";
-import { createNewDestinations, getAllDestinations, updateDestinationsById, deleteDestinationsById } from "../controllers/destinations.controllers.js";
+import {
+  createNewDestinations,
+  getAllDestinations,
+  updateDestinationsById,
+  deleteDestinationsById,
+} from "../controllers/destinations.controllers.js";
 import destinationsValidation from "../middleware/destinationsValidation.js";
 
 const router = express.Router();

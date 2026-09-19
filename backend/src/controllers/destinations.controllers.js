@@ -1,5 +1,11 @@
 import { validationResult } from "express-validator";
-import { createDestinations, getAllDestinations as allDestinations, updateDestinations, deleteDestinations, checkDestinationsExists } from "../repository/destinations.repository.js";
+import {
+  createDestinations,
+  getAllDestinations as allDestinations,
+  updateDestinations,
+  deleteDestinations,
+  checkDestinationsExists,
+} from "../repository/destinations.repository.js";
 
 export const createNewDestinations = async (req, res) => {
   const errors = validationResult(req);
@@ -24,7 +30,7 @@ export const getAllDestinations = async (req, res) => {
     console.error("Error fetching destinations:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const updateDestinationsById = async (req, res) => {
   const { id } = req.params;
@@ -41,12 +47,17 @@ export const updateDestinationsById = async (req, res) => {
   try {
     const { id } = req.params;
     const updatedDestinations = await updateDestinations(id, req.body);
-    res.status(200).json({ message: "Destinations updated successfully", data: updatedDestinations });
+    res
+      .status(200)
+      .json({
+        message: "Destinations updated successfully",
+        data: updatedDestinations,
+      });
   } catch (error) {
     console.error("Error updating destinations:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const deleteDestinationsById = async (req, res) => {
   try {
@@ -61,4 +72,4 @@ export const deleteDestinationsById = async (req, res) => {
     console.error("Error deleting destinations:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};
