@@ -21,6 +21,8 @@ import TripManagement from "./admin/page/TripManagement.jsx";
 import UserManagement from "./admin/page/UserManagement.jsx";
 import BookingManagement from "./admin/page/BookingManagement.jsx";
 import Notification from "./admin/page/Notification.jsx";
+import PaymentAndRevenue from "./admin/page/PaymentAndRevenue.jsx";
+import Settings from "./admin/page/Settings.jsx";
 
 const router = createBrowserRouter([
   {
@@ -58,7 +60,9 @@ const router = createBrowserRouter([
       { path: "trips", element: <TripManagement /> },
       { path: "users", element: <UserManagement /> },
       { path: "bookings", element: <BookingManagement /> },
+      { path: "payments", element: <PaymentAndRevenue /> },
       { path: "notifications", element: <Notification /> },
+      { path: "settings", element: <Settings /> },
       { path: "*", element: <Dashboard /> },
     ],
   },
