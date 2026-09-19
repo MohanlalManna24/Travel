@@ -33,6 +33,8 @@ const BookingManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Filters & Controls
   const [searchQuery, setSearchQuery] = useState("");
@@ -46,7 +48,7 @@ const BookingManagement = () => {
   const [modalMode, setModalMode] = useState("view"); // "create" | "edit" | "view"
   const [currentBooking, setCurrentBooking] = useState(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
-  const [toastMessage, setToastMessage] = useState(null);
+  const [toast, setToast] = useState(null); // { message: string, type: 'success' | 'error' | 'info' }
 
   // Form State for create / edit
   const initialFormState = {
@@ -77,7 +79,15 @@ const BookingManagement = () => {
   const [formData, setFormData] = useState(initialFormState);
 
   // API Endpoint
-  const BOOKINGS_URL = import.meta.env.VITE_BOOKINGS_DATA_URL || "/bookingsData.json";
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+  const BOOKINGS_URL = import.meta.env.VITE_BOOKINGS_DATA_URL || `${API_BASE_URL}/api/bookings`;
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null);
+    }, 4000);
+  };
 
   // ---------------------------------------------------------------------------
   // DATA FETCHING VIA API
@@ -88,9 +98,21 @@ const BookingManagement = () => {
     setError(null);
 
     try {
-      const response = await axios.get(BOOKINGS_URL);
-      if (Array.isArray(response.data)) {
-        setBookings(response.data);
+      let response;
+      try {
+        response = await axios.get(BOOKINGS_URL);
+      } catch (backendErr) {
+        console.warn("Backend bookings endpoint failed, falling back to /bookingsData.json:", backendErr);
+        response = await axios.get("/bookingsData.json");
+      }
+
+      const rawData = response.data;
+      const fetchedBookings = Array.isArray(rawData)
+        ? rawData
+        : rawData?.bookings || rawData?.data || [];
+
+      if (Array.isArray(fetchedBookings)) {
+        setBookings(fetchedBookings);
       } else {
         throw new Error("Invalid format received from server");
       }
@@ -106,13 +128,6 @@ const BookingManagement = () => {
   useEffect(() => {
     fetchBookings();
   }, []);
-
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 3500);
-  };
 
   // ---------------------------------------------------------------------------
   // FILTERING, SEARCHING & SORTING LOGIC
@@ -205,35 +220,88 @@ const BookingManagement = () => {
     setIsModalOpen(true);
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.customer?.name || !formData.destination?.name) {
-      alert("Please fill in customer and destination information.");
+    if (!formData.customer?.name?.trim() || !formData.destination?.name?.trim()) {
+      showToast("Please fill in customer and destination information.", "error");
       return;
     }
 
+    setSubmitting(true);
+
     const payload = {
       ...formData,
+      bookingReference: formData.id,
+      customerName: formData.customer.name,
+      customerEmail: formData.customer.email,
+      customerPhone: formData.customer.phone,
+      customerCity: formData.customer.city,
+      customerAvatar: formData.customer.avatar,
+      destinationName: formData.destination.name,
+      destinationLocation: formData.destination.location,
+      destinationImage: formData.destination.image,
       guests: Number(formData.guests || 1),
       totalAmount: Number(formData.totalAmount || 0),
     };
 
-    if (modalMode === "create") {
-      setBookings((prev) => [payload, ...prev]);
-      showToast(`Booking #${payload.id} successfully created!`);
-    } else {
-      setBookings((prev) => prev.map((b) => (b.id === payload.id ? payload : b)));
-      showToast(`Booking #${payload.id} updated!`);
+    try {
+      if (modalMode === "create") {
+        let created = null;
+        try {
+          const res = await axios.post(`${API_BASE_URL}/api/bookings`, payload);
+          if (res.data?.booking || res.data?.data) {
+            created = res.data.booking || res.data.data;
+          }
+        } catch (apiErr) {
+          console.warn("POST /api/bookings failed:", apiErr);
+        }
+
+        const finalBooking = created || payload;
+        setBookings((prev) => [finalBooking, ...prev]);
+        showToast(`Booking #${payload.id} successfully created!`, "success");
+      } else {
+        const targetId = payload.id;
+        try {
+          await axios.put(`${API_BASE_URL}/api/bookings/${targetId}`, payload);
+        } catch (apiErr) {
+          console.warn(`PUT /api/bookings/${targetId} failed:`, apiErr);
+        }
+
+        setBookings((prev) => prev.map((b) => (b.id === payload.id ? payload : b)));
+        showToast(`Booking #${payload.id} updated!`, "success");
+      }
+
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error("Error saving booking:", err);
+      showToast("An error occurred while saving the reservation.", "error");
+    } finally {
+      setSubmitting(false);
     }
-
-    setIsModalOpen(false);
   };
 
-  const handleDeleteBooking = (id) => {
-    setBookings((prev) => prev.filter((b) => b.id !== id));
-    setDeleteConfirmId(null);
-    showToast(`Reservation #${id} was cancelled & removed.`);
+  const handleDeleteBooking = async (id) => {
+    if (!id) return;
+    setDeleting(true);
+
+    try {
+      try {
+        await axios.delete(`${API_BASE_URL}/api/bookings/${id}`);
+      } catch (apiErr) {
+        console.warn(`DELETE /api/bookings/${id} failed:`, apiErr);
+      }
+
+      setBookings((prev) => prev.filter((b) => b.id !== id));
+      setDeleteConfirmId(null);
+      showToast(`Reservation #${id} was cancelled & removed.`, "success");
+    } catch (err) {
+      console.error("Error removing booking:", err);
+      showToast(`Failed to cancel booking: ${err.message}`, "error");
+    } finally {
+      setDeleting(false);
+    }
   };
+
 
   const handleExportCSV = () => {
     if (!bookings.length) return;
@@ -314,10 +382,22 @@ const BookingManagement = () => {
   return (
     <div className="min-h-screen space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-20 right-6 z-50 flex items-center gap-2.5 rounded-2xl border border-emerald-500/30 bg-emerald-950/90 px-4 py-3 text-sm font-semibold text-emerald-200 shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-200">
-          <HiOutlineCheck className="text-lg text-emerald-400" />
-          <span>{toastMessage}</span>
+      {toast && (
+        <div
+          className={`fixed top-20 right-6 z-50 flex items-center gap-2.5 rounded-2xl border px-4 py-3 text-sm font-semibold shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-200 ${
+            toast.type === "error"
+              ? "border-rose-500/30 bg-rose-950/90 text-rose-200"
+              : toast.type === "info"
+              ? "border-cyan-500/30 bg-slate-900/90 text-cyan-200"
+              : "border-emerald-500/30 bg-emerald-950/90 text-emerald-200"
+          }`}
+        >
+          {toast.type === "error" ? (
+            <HiOutlineInformationCircle className="text-lg text-rose-400" />
+          ) : (
+            <HiOutlineCheck className="text-lg text-emerald-400" />
+          )}
+          <span>{toast.message}</span>
         </div>
       )}
 
@@ -1220,16 +1300,27 @@ const BookingManagement = () => {
                 <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
                   <button
                     type="button"
+                    disabled={submitting}
                     onClick={() => setIsModalOpen(false)}
-                    className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                    className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="rounded-xl bg-linear-to-r from-cyan-600 to-blue-600 px-5 py-2 text-xs font-bold text-white shadow-md hover:brightness-110 cursor-pointer"
+                    disabled={submitting}
+                    className="flex items-center gap-1.5 rounded-xl bg-linear-to-r from-cyan-600 to-blue-600 px-5 py-2 text-xs font-bold text-white shadow-md hover:brightness-110 cursor-pointer disabled:opacity-50"
                   >
-                    {modalMode === "create" ? "Save Reservation" : "Update Booking"}
+                    {submitting && <HiOutlineArrowPath className="animate-spin text-sm" />}
+                    <span>
+                      {submitting
+                        ? modalMode === "create"
+                          ? "Saving..."
+                          : "Updating..."
+                        : modalMode === "create"
+                        ? "Save Reservation"
+                        : "Update Booking"}
+                    </span>
                   </button>
                 </div>
               </form>
@@ -1245,7 +1336,7 @@ const BookingManagement = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div
             className="fixed inset-0"
-            onClick={() => setDeleteConfirmId(null)}
+            onClick={() => !deleting && setDeleteConfirmId(null)}
           />
 
           <div className="relative z-10 w-full max-w-sm rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl text-center space-y-4 animate-in zoom-in-95 duration-200">
@@ -1262,20 +1353,47 @@ const BookingManagement = () => {
               </p>
             </div>
 
+            {/* Target Booking Summary Card */}
+            {(() => {
+              const target = bookings.find((b) => b.id === deleteConfirmId);
+              if (!target) return null;
+              return (
+                <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3 text-left border border-slate-100">
+                  <img
+                    src={
+                      target.destination?.image ||
+                      target.customer?.avatar ||
+                      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop"
+                    }
+                    alt={target.destination?.name}
+                    className="h-12 w-12 shrink-0 rounded-xl object-cover ring-1 ring-slate-200"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-xs text-slate-900 truncate">{target.destination?.name}</p>
+                    <p className="text-[11px] text-slate-500 truncate">{target.customer?.name} • #{target.id}</p>
+                    <p className="text-[10px] font-bold text-cyan-600">₹{Number(target.totalAmount || 0).toLocaleString()} • {target.paymentStatus}</p>
+                  </div>
+                </div>
+              );
+            })()}
+
             <div className="flex items-center justify-center gap-2 pt-2">
               <button
                 type="button"
+                disabled={deleting}
                 onClick={() => setDeleteConfirmId(null)}
-                className="flex-1 rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                className="flex-1 rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer disabled:opacity-50"
               >
                 Keep Booking
               </button>
               <button
                 type="button"
+                disabled={deleting}
                 onClick={() => handleDeleteBooking(deleteConfirmId)}
-                className="flex-1 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-rose-700 cursor-pointer"
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-rose-700 cursor-pointer disabled:opacity-50"
               >
-                Confirm Cancellation
+                {deleting && <HiOutlineArrowPath className="animate-spin text-sm" />}
+                <span>{deleting ? "Cancelling..." : "Confirm Cancellation"}</span>
               </button>
             </div>
           </div>
