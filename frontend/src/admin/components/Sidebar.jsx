@@ -297,8 +297,8 @@ const Sidebar = () => {
           </div>
         </div>
 
-        {/* Middle Scrollable Navigation List */}
-        <div className="custom-scrollbar relative z-10 flex-1 space-y-6 overflow-y-auto px-4 py-4">
+        {/* Middle Scrollable Navigation List (Hidden Scrollbar) */}
+        <div className="relative z-10 flex-1 space-y-6 overflow-y-auto no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-4 py-4">
           {ADMIN_NAV_GROUPS.map((group) => (
             <div key={group.groupTitle} className="space-y-1.5">
               <h3 className="px-3 text-[10px] font-bold tracking-wider text-slate-400 uppercase">

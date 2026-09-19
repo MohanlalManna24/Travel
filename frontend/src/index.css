@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-
 .bgImg{
     background-image: url(./assets/images/heroImg.png);
     width: 100%;
@@ -9,3 +8,13 @@
     top: 0;
     z-index: -1;
 }
+
+/* Hide scrollbar while preserving smooth scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
