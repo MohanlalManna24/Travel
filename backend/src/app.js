@@ -2,10 +2,14 @@ import express from "express";
 import userRoutes from "./routes/user.routes.js";
 import userFullDetails from "./routes/userFullDetails.routes.js";
 import destinations from "./routes/destinations.routes.js"
+import cors from "cors";
 
 const app = express();
 
 app.use(express.json());
+app.use(cors({
+    origin:"http://localhost:5173"
+}));
 
 app.use("/api/users", userRoutes);
 

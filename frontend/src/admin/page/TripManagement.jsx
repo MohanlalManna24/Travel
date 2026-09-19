@@ -30,6 +30,8 @@ const TripManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Filter & Search & View controls
   const [searchQuery, setSearchQuery] = useState("");
@@ -42,7 +44,7 @@ const TripManagement = () => {
   const [modalMode, setModalMode] = useState("create"); // "create" | "edit"
   const [currentTrip, setCurrentTrip] = useState(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
-  const [toastMessage, setToastMessage] = useState(null);
+  const [toast, setToast] = useState(null); // { message: string, type: 'success' | 'error' | 'info' }
 
   // Form State
   const initialFormState = {
@@ -58,8 +60,16 @@ const TripManagement = () => {
   const [formData, setFormData] = useState(initialFormState);
 
   // API Endpoint
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
   const DESTINATIONS_URL =
-    import.meta.env.VITE_DESTINATIONS_DETAILS_URL || "/destinationsData.json";
+    import.meta.env.VITE_DESTINATIONS_DETAILS_URL || `${API_BASE_URL}/api/destinations`;
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null);
+    }, 4000);
+  };
 
   // ---------------------------------------------------------------------------
   // DATA FETCHING VIA API
@@ -71,8 +81,37 @@ const TripManagement = () => {
 
     try {
       const response = await axios.get(DESTINATIONS_URL);
-      if (Array.isArray(response.data)) {
-        setTrips(response.data);
+      const rawData = response.data;
+      const fetchedTrips = Array.isArray(rawData)
+        ? rawData
+        : rawData?.data || rawData?.destinations || [];
+
+      if (Array.isArray(fetchedTrips)) {
+        setTrips(
+          fetchedTrips.map((trip) => {
+            const rawLocation =
+              trip.location ||
+              [trip.state, trip.country].filter(Boolean).join(", ") ||
+              "India";
+            return {
+              ...trip,
+              id: String(trip.id),
+              name: trip.name || trip.title || "Untitled Destination",
+              title: trip.title || trip.name || "Untitled Destination",
+              location: rawLocation,
+              pricePerHead: Number(trip.pricePerHead ?? trip.price ?? 0),
+              price: Number(trip.price ?? trip.pricePerHead ?? 0),
+              days: Number(trip.days || 1),
+              image:
+                trip.image ||
+                "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop",
+              description: trip.description || "",
+              status: trip.status
+                ? trip.status.charAt(0).toUpperCase() + trip.status.slice(1)
+                : "Active",
+            };
+          })
+        );
       } else {
         throw new Error("Invalid response format received from server");
       }
@@ -89,13 +128,6 @@ const TripManagement = () => {
     fetchTrips();
   }, []);
 
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 3500);
-  };
-
   // ---------------------------------------------------------------------------
   // FILTERING, SEARCHING & SORTING LOGIC
   // ---------------------------------------------------------------------------
@@ -109,7 +141,8 @@ const TripManagement = () => {
         (t) =>
           t.name?.toLowerCase().includes(q) ||
           t.location?.toLowerCase().includes(q) ||
-          t.description?.toLowerCase().includes(q)
+          t.description?.toLowerCase().includes(q) ||
+          String(t.id).toLowerCase().includes(q)
       );
     }
 
@@ -174,6 +207,7 @@ const TripManagement = () => {
     setFormData({
       ...initialFormState,
       id: `destination-${Date.now()}`,
+      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop",
     });
     setIsModalOpen(true);
   };
@@ -183,9 +217,9 @@ const TripManagement = () => {
     setCurrentTrip(trip);
     setFormData({
       id: trip.id,
-      name: trip.name || "",
+      name: trip.name || trip.title || "",
       location: trip.location || "",
-      pricePerHead: trip.pricePerHead || "",
+      pricePerHead: trip.pricePerHead || trip.price || "",
       days: trip.days || "",
       image: trip.image || "",
       description: trip.description || "",
@@ -194,39 +228,145 @@ const TripManagement = () => {
     setIsModalOpen(true);
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.location || !formData.pricePerHead) {
-      alert("Please fill in all required fields.");
+    if (!formData.name?.trim() || !formData.location?.trim() || !formData.pricePerHead) {
+      showToast("Please fill in all required fields (Name, Location, Price).", "error");
       return;
     }
 
+    setSubmitting(true);
+
     const payload = {
       ...formData,
+      name: formData.name.trim(),
+      title: formData.name.trim(),
+      location: formData.location.trim(),
       pricePerHead: Number(formData.pricePerHead),
+      price: Number(formData.pricePerHead),
       days: Number(formData.days) || 1,
+      image: formData.image || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop",
+      description: formData.description || "",
+      status: formData.status || "Active",
       detailsUrl: `/destination/${formData.id}`,
       bookingUrl: "/contact",
     };
 
-    if (modalMode === "create") {
-      setTrips((prev) => [payload, ...prev]);
-      showToast(`Trip "${payload.name}" successfully created!`);
-    } else {
-      setTrips((prev) =>
-        prev.map((t) => (t.id === payload.id ? payload : t))
-      );
-      showToast(`Trip "${payload.name}" updated successfully!`);
-    }
+    try {
+      if (modalMode === "create") {
+        let created = null;
+        try {
+          const res = await axios.post(`${DESTINATIONS_URL}/create`, {
+            title: payload.name,
+            name: payload.name,
+            location: payload.location,
+            price: payload.pricePerHead,
+            pricePerHead: payload.pricePerHead,
+            days: payload.days,
+            image: payload.image,
+            description: payload.description,
+            status: payload.status.toLowerCase(),
+          });
+          if (res.data?.destination || res.data?.data) {
+            const data = res.data.destination || res.data.data;
+            created = {
+              ...payload,
+              id: String(data.id || payload.id),
+            };
+          }
+        } catch (apiErr) {
+          console.warn("POST /destinations/create failed, trying direct POST:", apiErr);
+          try {
+            const res = await axios.post(DESTINATIONS_URL, payload);
+            if (res.data?.id) {
+              created = { ...payload, id: String(res.data.id) };
+            }
+          } catch (fallbackErr) {
+            console.warn("POST fallback also failed:", fallbackErr);
+            if (apiErr.response?.data?.errors?.[0]?.msg || apiErr.response?.data?.message) {
+              const msg = apiErr.response?.data?.errors?.[0]?.msg || apiErr.response?.data?.message;
+              showToast(`Failed: ${msg}`, "error");
+              setSubmitting(false);
+              return;
+            }
+          }
+        }
 
-    setIsModalOpen(false);
+        const finalTrip = created || payload;
+        setTrips((prev) => [finalTrip, ...prev]);
+        showToast(`Trip "${payload.name}" successfully created!`, "success");
+      } else {
+        const targetId = payload.id;
+        try {
+          await axios.put(`${DESTINATIONS_URL}/update/${targetId}`, {
+            title: payload.name,
+            name: payload.name,
+            location: payload.location,
+            price: payload.pricePerHead,
+            pricePerHead: payload.pricePerHead,
+            days: payload.days,
+            image: payload.image,
+            description: payload.description,
+            status: payload.status.toLowerCase(),
+          });
+        } catch (apiErr) {
+          console.warn(`PUT /update/${targetId} failed, trying /${targetId}:`, apiErr);
+          try {
+            await axios.put(`${DESTINATIONS_URL}/${targetId}`, payload);
+          } catch (fallbackErr) {
+            console.warn("PUT fallback failed:", fallbackErr);
+            if (apiErr.response?.data?.errors?.[0]?.msg || apiErr.response?.data?.message) {
+              const msg = apiErr.response?.data?.errors?.[0]?.msg || apiErr.response?.data?.message;
+              showToast(`Update failed: ${msg}`, "error");
+              setSubmitting(false);
+              return;
+            }
+          }
+        }
+
+        setTrips((prev) =>
+          prev.map((t) => (t.id === payload.id ? payload : t))
+        );
+        showToast(`Trip "${payload.name}" updated successfully!`, "success");
+      }
+
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error("Error saving trip:", err);
+      showToast("An unexpected error occurred while saving.", "error");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleDeleteTrip = (id) => {
+  const handleDeleteTrip = async (id) => {
+    if (!id) return;
+    setDeleting(true);
+
     const target = trips.find((t) => t.id === id);
-    setTrips((prev) => prev.filter((t) => t.id !== id));
-    setDeleteConfirmId(null);
-    showToast(`Trip "${target?.name || id}" removed.`);
+    const targetName = target?.name || `ID ${id}`;
+
+    try {
+      try {
+        await axios.delete(`${DESTINATIONS_URL}/delete/${id}`);
+      } catch (apiErr) {
+        console.warn(`DELETE /delete/${id} failed, trying /${id}:`, apiErr);
+        try {
+          await axios.delete(`${DESTINATIONS_URL}/${id}`);
+        } catch (fallbackErr) {
+          console.warn("DELETE fallback failed:", fallbackErr);
+        }
+      }
+
+      setTrips((prev) => prev.filter((t) => t.id !== id));
+      setDeleteConfirmId(null);
+      showToast(`Trip "${targetName}" removed permanently.`, "success");
+    } catch (err) {
+      console.error("Failed to delete trip:", err);
+      showToast(`Failed to delete trip: ${err.message}`, "error");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const handleExportCSV = () => {
@@ -250,8 +390,9 @@ const TripManagement = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showToast("CSV file exported successfully!");
+    showToast("CSV file exported successfully!", "info");
   };
+
 
   // ---------------------------------------------------------------------------
   // RENDER
@@ -259,10 +400,22 @@ const TripManagement = () => {
   return (
     <div className="min-h-screen space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Toast Notification Alert */}
-      {toastMessage && (
-        <div className="fixed top-20 right-6 z-50 flex items-center gap-2.5 rounded-2xl border border-emerald-500/30 bg-emerald-950/90 px-4 py-3 text-sm font-semibold text-emerald-200 shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-200">
-          <HiOutlineCheck className="text-lg text-emerald-400" />
-          <span>{toastMessage}</span>
+      {toast && (
+        <div
+          className={`fixed top-20 right-6 z-50 flex items-center gap-2.5 rounded-2xl border px-4 py-3 text-sm font-semibold shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-200 ${
+            toast.type === "error"
+              ? "border-rose-500/30 bg-rose-950/90 text-rose-200"
+              : toast.type === "info"
+              ? "border-cyan-500/30 bg-slate-900/90 text-cyan-200"
+              : "border-emerald-500/30 bg-emerald-950/90 text-emerald-200"
+          }`}
+        >
+          {toast.type === "error" ? (
+            <HiOutlineInformationCircle className="text-lg text-rose-400" />
+          ) : (
+            <HiOutlineCheck className="text-lg text-emerald-400" />
+          )}
+          <span>{toast.message}</span>
         </div>
       )}
 
@@ -893,16 +1046,27 @@ const TripManagement = () => {
               <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
                 <button
                   type="button"
+                  disabled={submitting}
                   onClick={() => setIsModalOpen(false)}
-                  className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                  className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-xl bg-linear-to-r from-cyan-600 to-blue-600 px-5 py-2 text-xs font-bold text-white shadow-md hover:brightness-110 cursor-pointer"
+                  disabled={submitting}
+                  className="flex items-center gap-1.5 rounded-xl bg-linear-to-r from-cyan-600 to-blue-600 px-5 py-2 text-xs font-bold text-white shadow-md hover:brightness-110 cursor-pointer disabled:opacity-50"
                 >
-                  {modalMode === "create" ? "Add to Catalog" : "Save Changes"}
+                  {submitting && <HiOutlineArrowPath className="animate-spin text-sm" />}
+                  <span>
+                    {submitting
+                      ? modalMode === "create"
+                        ? "Adding..."
+                        : "Saving..."
+                      : modalMode === "create"
+                      ? "Add to Catalog"
+                      : "Save Changes"}
+                  </span>
                 </button>
               </div>
             </form>
@@ -917,7 +1081,7 @@ const TripManagement = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div
             className="fixed inset-0"
-            onClick={() => setDeleteConfirmId(null)}
+            onClick={() => !deleting && setDeleteConfirmId(null)}
           />
 
           <div className="relative z-10 w-full max-w-sm rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl text-center space-y-4 animate-in zoom-in-95 duration-200">
@@ -930,24 +1094,50 @@ const TripManagement = () => {
                 Delete Trip Listing?
               </h3>
               <p className="mt-1 text-xs text-slate-500">
-                This action will remove the itinerary from the active travel catalog.
+                This action will permanently remove the itinerary from the active travel catalog.
               </p>
             </div>
+
+            {/* Target Trip Summary Card */}
+            {(() => {
+              const target = trips.find((t) => t.id === deleteConfirmId);
+              if (!target) return null;
+              return (
+                <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3 text-left border border-slate-100">
+                  <img
+                    src={
+                      target.image ||
+                      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop"
+                    }
+                    alt={target.name}
+                    className="h-12 w-12 shrink-0 rounded-xl object-cover ring-1 ring-slate-200"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-xs text-slate-900 truncate">{target.name}</p>
+                    <p className="text-[11px] text-slate-500 truncate">{target.location}</p>
+                    <p className="text-[10px] font-semibold text-cyan-600">₹{Number(target.pricePerHead || target.price || 0).toLocaleString()} • {target.days} Days</p>
+                  </div>
+                </div>
+              );
+            })()}
 
             <div className="flex items-center justify-center gap-2 pt-2">
               <button
                 type="button"
+                disabled={deleting}
                 onClick={() => setDeleteConfirmId(null)}
-                className="flex-1 rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                className="flex-1 rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 type="button"
+                disabled={deleting}
                 onClick={() => handleDeleteTrip(deleteConfirmId)}
-                className="flex-1 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-rose-700 cursor-pointer"
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-rose-700 cursor-pointer disabled:opacity-50"
               >
-                Confirm Delete
+                {deleting && <HiOutlineArrowPath className="animate-spin text-sm" />}
+                <span>{deleting ? "Deleting..." : "Confirm Delete"}</span>
               </button>
             </div>
           </div>

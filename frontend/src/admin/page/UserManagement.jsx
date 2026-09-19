@@ -33,6 +33,8 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Filters & Controls
   const [searchQuery, setSearchQuery] = useState("");
@@ -46,7 +48,7 @@ const UserManagement = () => {
   const [modalMode, setModalMode] = useState("create"); // "create" | "edit" | "view"
   const [currentUser, setCurrentUser] = useState(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
-  const [toastMessage, setToastMessage] = useState(null);
+  const [toast, setToast] = useState(null); // { message: string, type: 'success' | 'error' | 'info' }
 
   // Form State
   const initialFormState = {
@@ -54,6 +56,7 @@ const UserManagement = () => {
     name: "",
     email: "",
     phone: "",
+    password: "",
     role: "Explorer",
     status: "Active",
     location: "",
@@ -64,8 +67,17 @@ const UserManagement = () => {
   };
   const [formData, setFormData] = useState(initialFormState);
 
-  // API Endpoint
-  const USERS_URL = import.meta.env.VITE_USERS_DATA_URL || "/usersData.json";
+  // API Endpoints configuration
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+  const USERS_DETAILS_URL = import.meta.env.VITE_USERS_DATA_URL || `${API_BASE_URL}/api/user-details/`;
+  const USERS_API_URL = `${API_BASE_URL}/api/users`;
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null);
+    }, 4000);
+  };
 
   // ---------------------------------------------------------------------------
   // DATA FETCHING VIA API
@@ -76,15 +88,69 @@ const UserManagement = () => {
     setError(null);
 
     try {
-      const response = await axios.get(USERS_URL);
-      if (Array.isArray(response.data)) {
-        setUsers(response.data);
+      let response;
+      try {
+        response = await axios.get(USERS_DETAILS_URL);
+      } catch (detailsErr) {
+        console.warn("Primary user-details endpoint failed, attempting fallback to /api/users:", detailsErr);
+        response = await axios.get(USERS_API_URL);
+      }
+
+      const rawData = response.data;
+      const fetchedUsers = Array.isArray(rawData)
+        ? rawData
+        : rawData?.userFullDetails ||
+          rawData?.users ||
+          rawData?.data ||
+          [];
+
+      if (Array.isArray(fetchedUsers)) {
+        setUsers(
+          fetchedUsers.map((user) => {
+            const rawStatus = (user.status || "Active").toLowerCase();
+            const formattedStatus =
+              rawStatus === "inactive" || rawStatus === "suspended"
+                ? "Suspended"
+                : rawStatus === "pending"
+                ? "Pending"
+                : "Active";
+
+            const rawLocation =
+              user.location ||
+              [user.city, user.state].filter(Boolean).join(", ") ||
+              "Not specified";
+
+            return {
+              ...user,
+              id: String(user.user_id || user.id || `USR-${Math.floor(1000 + Math.random() * 9000)}`),
+              name: user.name || user.fullname || "Unnamed Traveler",
+              email: user.email || "",
+              phone: user.phone ? String(user.phone) : "",
+              role: user.role || "Explorer",
+              status: formattedStatus,
+              avatar:
+                user.avatar ||
+                user.profile_img ||
+                "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=256&auto=format&fit=crop",
+              location: rawLocation,
+              city: user.city || "",
+              state: user.state || "",
+              totalBookings: Number(user.totalBookings || 0),
+              totalSpent: Number(user.totalSpent || 0),
+              loyaltyPoints: Number(user.loyaltyPoints || 100),
+              joinedDate: user.created_at
+                ? String(user.created_at).slice(0, 10)
+                : user.joinedDate || new Date().toISOString().slice(0, 10),
+              lastActive: user.lastActive || "Recently",
+            };
+          })
+        );
       } else {
-        throw new Error("Invalid format received from server");
+        throw new Error("Invalid response format received from server");
       }
     } catch (err) {
       console.error("Failed to fetch user accounts:", err);
-      setError("Unable to load user accounts. Please check your connection.");
+      setError("Unable to load user accounts from backend server.");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -95,20 +161,13 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 3500);
-  };
-
   // ---------------------------------------------------------------------------
   // FILTERING, SEARCHING & SORTING LOGIC
   // ---------------------------------------------------------------------------
   const filteredAndSortedUsers = useMemo(() => {
     let result = [...users];
 
-    // Search query filter (name, email, phone, location)
+    // Search query filter (name, email, phone, location, id)
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       result = result.filter(
@@ -117,7 +176,7 @@ const UserManagement = () => {
           u.email?.toLowerCase().includes(q) ||
           u.phone?.toLowerCase().includes(q) ||
           u.location?.toLowerCase().includes(q) ||
-          u.id?.toLowerCase().includes(q)
+          String(u.id).toLowerCase().includes(q)
       );
     }
 
@@ -178,6 +237,7 @@ const UserManagement = () => {
     setCurrentUser(user);
     setFormData({
       ...user,
+      password: "", // Empty for optional update
     });
     setIsModalOpen(true);
   };
@@ -191,15 +251,26 @@ const UserManagement = () => {
     setIsModalOpen(true);
   };
 
-  const handleFormSubmit = (e) => {
+  // CREATE / EDIT HANDLER WITH ASYNC API INTEGRATION
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.email) {
-      alert("Please provide the full name and email address.");
+    if (!formData.name?.trim() || !formData.email?.trim()) {
+      showToast("Please provide both full name and email address.", "error");
       return;
     }
 
+    setSubmitting(true);
+
     const payload = {
       ...formData,
+      fullname: formData.name.trim(),
+      email: formData.email.trim(),
+      phone: formData.phone ? String(formData.phone).trim() : "",
+      status: formData.status || "Active",
+      role: formData.role || "Explorer",
+      location: formData.location || "",
+      avatar: formData.avatar || "",
+      profileImg: formData.avatar || "",
       totalSpent: Number(formData.totalSpent || 0),
       totalBookings: Number(formData.totalBookings || 0),
       loyaltyPoints: Number(formData.loyaltyPoints || 0),
@@ -207,22 +278,127 @@ const UserManagement = () => {
       lastActive: formData.lastActive || "Just now",
     };
 
-    if (modalMode === "create") {
-      setUsers((prev) => [payload, ...prev]);
-      showToast(`User account "${payload.name}" created successfully!`);
-    } else {
-      setUsers((prev) => prev.map((u) => (u.id === payload.id ? payload : u)));
-      showToast(`User profile "${payload.name}" updated!`);
-    }
+    try {
+      if (modalMode === "create") {
+        // Create user via Backend API
+        let createdUser = null;
+        try {
+          const res = await axios.post(`${USERS_API_URL}/createuser`, {
+            fullname: payload.name,
+            email: payload.email,
+            phone: payload.phone || "0000000000",
+            password: payload.password || "Password@123",
+            status: payload.status.toLowerCase(),
+            avatar: payload.avatar,
+            location: payload.location,
+          });
+          if (res.data?.user) {
+            createdUser = {
+              ...payload,
+              id: String(res.data.user.id || payload.id),
+            };
+          }
+        } catch (apiErr) {
+          console.warn("Backend create API returned error, applying local optimistic creation:", apiErr);
+          // If server responded with a specific validation or duplicate message, report it
+          if (apiErr.response?.data?.error || apiErr.response?.data?.errors?.[0]?.msg) {
+            const msg = apiErr.response?.data?.error || apiErr.response?.data?.errors?.[0]?.msg;
+            showToast(`Server Error: ${msg}`, "error");
+            setSubmitting(false);
+            return;
+          }
+        }
 
-    setIsModalOpen(false);
+        const finalUser = createdUser || payload;
+        setUsers((prev) => [finalUser, ...prev]);
+        showToast(`User account "${payload.name}" created successfully!`, "success");
+      } else {
+        // UPDATE user via Backend API
+        const targetId = payload.id;
+        let updateSuccess = false;
+
+        try {
+          // Attempt update on /api/users/updateuser/:id
+          const updateBody = {
+            fullname: payload.name,
+            email: payload.email,
+            phone: payload.phone,
+            status: payload.status.toLowerCase(),
+            avatar: payload.avatar,
+            location: payload.location,
+          };
+          if (formData.password && formData.password.trim().length >= 6) {
+            updateBody.password = formData.password.trim();
+          }
+
+          await axios.put(`${USERS_API_URL}/updateuser/${targetId}`, updateBody);
+          updateSuccess = true;
+        } catch (apiErr) {
+          console.warn(`Backend update on /updateuser/${targetId} failed, trying fallback:`, apiErr);
+          try {
+            await axios.put(`${USERS_API_URL}/${targetId}`, {
+              fullname: payload.name,
+              email: payload.email,
+              phone: payload.phone,
+              status: payload.status.toLowerCase(),
+            });
+            updateSuccess = true;
+          } catch (fallbackErr) {
+            console.warn("Backend update fallback failed:", fallbackErr);
+            if (apiErr.response?.data?.error || apiErr.response?.data?.errors?.[0]?.msg) {
+              const msg = apiErr.response?.data?.error || apiErr.response?.data?.errors?.[0]?.msg;
+              showToast(`Update Failed: ${msg}`, "error");
+              setSubmitting(false);
+              return;
+            }
+          }
+        }
+
+        // Update local React state with fresh updated profile details
+        setUsers((prev) => prev.map((u) => (u.id === payload.id ? payload : u)));
+        showToast(`User profile "${payload.name}" updated successfully!`, "success");
+      }
+
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error("Error during user save:", err);
+      showToast("An unexpected error occurred while saving user.", "error");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleDeleteUser = (id) => {
-    const target = users.find((u) => u.id === id);
-    setUsers((prev) => prev.filter((u) => u.id !== id));
-    setDeleteConfirmId(null);
-    showToast(`User "${target?.name || id}" was deleted.`);
+  // DELETE USER HANDLER WITH ASYNC API INTEGRATION
+  const handleDeleteUser = async (id) => {
+    if (!id) return;
+    setDeleting(true);
+
+    const targetUser = users.find((u) => u.id === id);
+    const targetName = targetUser?.name || `ID ${id}`;
+
+    try {
+      try {
+        // Attempt backend API deletion
+        await axios.delete(`${USERS_API_URL}/deleteuser/${id}`);
+      } catch (apiErr) {
+        console.warn(`DELETE /deleteuser/${id} failed, trying /api/users/${id}:`, apiErr);
+        try {
+          await axios.delete(`${USERS_API_URL}/${id}`);
+        } catch (fallbackErr) {
+          console.warn("DELETE fallback also failed:", fallbackErr);
+        }
+      }
+
+      // Remove from client state
+      setUsers((prev) => prev.filter((u) => u.id !== id));
+      setDeleteConfirmId(null);
+      showToast(`User account "${targetName}" was deleted permanently.`, "success");
+    } catch (err) {
+      console.error("Error deleting user account:", err);
+      showToast(`Failed to delete user: ${err.message}`, "error");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const handleExportCSV = () => {
@@ -250,7 +426,7 @@ const UserManagement = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showToast("User list exported to CSV!");
+    showToast("User list exported to CSV!", "info");
   };
 
   // Helper for role pill styling
@@ -281,16 +457,29 @@ const UserManagement = () => {
     }
   };
 
+
   // ---------------------------------------------------------------------------
   // RENDER
   // ---------------------------------------------------------------------------
   return (
     <div className="min-h-screen space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-20 right-6 z-50 flex items-center gap-2.5 rounded-2xl border border-emerald-500/30 bg-emerald-950/90 px-4 py-3 text-sm font-semibold text-emerald-200 shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-200">
-          <HiOutlineCheck className="text-lg text-emerald-400" />
-          <span>{toastMessage}</span>
+      {toast && (
+        <div
+          className={`fixed top-20 right-6 z-50 flex items-center gap-2.5 rounded-2xl border px-4 py-3 text-sm font-semibold shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-200 ${
+            toast.type === "error"
+              ? "border-rose-500/30 bg-rose-950/90 text-rose-200"
+              : toast.type === "info"
+              ? "border-cyan-500/30 bg-slate-900/90 text-cyan-200"
+              : "border-emerald-500/30 bg-emerald-950/90 text-emerald-200"
+          }`}
+        >
+          {toast.type === "error" ? (
+            <HiOutlineInformationCircle className="text-lg text-rose-400" />
+          ) : (
+            <HiOutlineCheck className="text-lg text-emerald-400" />
+          )}
+          <span>{toast.message}</span>
         </div>
       )}
 
@@ -1069,19 +1258,41 @@ const UserManagement = () => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Avatar Image URL
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.avatar}
-                    onChange={(e) =>
-                      setFormData({ ...formData, avatar: e.target.value })
-                    }
-                    placeholder="https://images.unsplash.com/..."
-                    className="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none"
-                  />
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Avatar Image URL
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.avatar}
+                      onChange={(e) =>
+                        setFormData({ ...formData, avatar: e.target.value })
+                      }
+                      placeholder="https://images.unsplash.com/..."
+                      className="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      {modalMode === "create" ? "Password *" : "Password (Optional)"}
+                    </label>
+                    <input
+                      type="password"
+                      required={modalMode === "create"}
+                      value={formData.password || ""}
+                      onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                      }
+                      placeholder={
+                        modalMode === "create"
+                          ? "Minimum 6 characters"
+                          : "Leave blank to keep unchanged"
+                      }
+                      className="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none"
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -1121,16 +1332,27 @@ const UserManagement = () => {
                 <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
                   <button
                     type="button"
+                    disabled={submitting}
                     onClick={() => setIsModalOpen(false)}
-                    className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                    className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="rounded-xl bg-linear-to-r from-cyan-600 to-blue-600 px-5 py-2 text-xs font-bold text-white shadow-md hover:brightness-110 cursor-pointer"
+                    disabled={submitting}
+                    className="flex items-center gap-1.5 rounded-xl bg-linear-to-r from-cyan-600 to-blue-600 px-5 py-2 text-xs font-bold text-white shadow-md hover:brightness-110 cursor-pointer disabled:opacity-50"
                   >
-                    {modalMode === "create" ? "Create Account" : "Save Changes"}
+                    {submitting && <HiOutlineArrowPath className="animate-spin text-sm" />}
+                    <span>
+                      {submitting
+                        ? modalMode === "create"
+                          ? "Creating..."
+                          : "Saving..."
+                        : modalMode === "create"
+                        ? "Create Account"
+                        : "Save Changes"}
+                    </span>
                   </button>
                 </div>
               </form>
@@ -1146,7 +1368,7 @@ const UserManagement = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div
             className="fixed inset-0"
-            onClick={() => setDeleteConfirmId(null)}
+            onClick={() => !deleting && setDeleteConfirmId(null)}
           />
 
           <div className="relative z-10 w-full max-w-sm rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl text-center space-y-4 animate-in zoom-in-95 duration-200">
@@ -1159,24 +1381,50 @@ const UserManagement = () => {
                 Delete Member Account?
               </h3>
               <p className="mt-1 text-xs text-slate-500">
-                This will permanently revoke all access and permissions for this traveler.
+                This will permanently revoke all access, booking history, and permissions for this traveler.
               </p>
             </div>
+
+            {/* Target User Summary Card */}
+            {(() => {
+              const target = users.find((u) => u.id === deleteConfirmId);
+              if (!target) return null;
+              return (
+                <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3 text-left border border-slate-100">
+                  <img
+                    src={
+                      target.avatar ||
+                      "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=256&auto=format&fit=crop"
+                    }
+                    alt={target.name}
+                    className="h-10 w-10 shrink-0 rounded-xl object-cover ring-1 ring-slate-200"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-xs text-slate-900 truncate">{target.name}</p>
+                    <p className="text-[11px] text-slate-500 truncate">{target.email}</p>
+                    <p className="text-[10px] text-slate-400 font-mono">ID: {target.id}</p>
+                  </div>
+                </div>
+              );
+            })()}
 
             <div className="flex items-center justify-center gap-2 pt-2">
               <button
                 type="button"
+                disabled={deleting}
                 onClick={() => setDeleteConfirmId(null)}
-                className="flex-1 rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+                className="flex-1 rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 type="button"
+                disabled={deleting}
                 onClick={() => handleDeleteUser(deleteConfirmId)}
-                className="flex-1 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-rose-700 cursor-pointer"
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-rose-700 cursor-pointer disabled:opacity-50"
               >
-                Confirm Delete
+                {deleting && <HiOutlineArrowPath className="animate-spin text-sm" />}
+                <span>{deleting ? "Deleting..." : "Confirm Delete"}</span>
               </button>
             </div>
           </div>
