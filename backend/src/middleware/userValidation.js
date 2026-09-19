@@ -1,12 +1,57 @@
 import { body } from "express-validator";
 
-export const userValidation = [
+export const registerValidation = [
   body("fullname")
+    .optional()
+    .trim()
+    .custom((val, { req }) => {
+      const name = val || req.body.fullName || req.body.name;
+      if (!name || name.trim().length < 2) {
+        throw new Error("Full name must be at least 2 characters long");
+      }
+      return true;
+    }),
+  body("email")
     .trim()
     .notEmpty()
-    .withMessage("Full name is required")
-    .isLength({ min: 3 })
-    .withMessage("Full name must be at least 3 characters long"),
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("Please enter a valid email address"),
+  body("phone")
+    .optional()
+    .trim(),
+  body("password")
+    .trim()
+    .notEmpty()
+    .withMessage("Password is required")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
+];
+
+export const loginValidation = [
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("Please enter a valid email address"),
+  body("password")
+    .trim()
+    .notEmpty()
+    .withMessage("Password is required"),
+];
+
+export const userValidation = [
+  body("fullname")
+    .optional()
+    .trim()
+    .custom((val, { req }) => {
+      const name = val || req.body.fullName || req.body.name;
+      if (!name || name.trim().length < 2) {
+        throw new Error("Full name must be at least 2 characters long");
+      }
+      return true;
+    }),
   body("email")
     .trim()
     .notEmpty()
@@ -14,15 +59,11 @@ export const userValidation = [
     .isEmail()
     .withMessage("Invalid email format"),
   body("phone")
-    .trim()
-    .notEmpty()
-    .withMessage("Phone number is required")
-    .isLength({ min: 7, max: 20 })
-    .withMessage("Phone number must be between 7 and 20 digits"),
+    .optional()
+    .trim(),
   body("password")
+    .optional({ checkFalsy: true })
     .trim()
-    .notEmpty()
-    .withMessage("Password is required")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),
 ];
@@ -32,9 +73,7 @@ export const userUpdateValidation = [
     .optional()
     .trim()
     .notEmpty()
-    .withMessage("Full name cannot be empty")
-    .isLength({ min: 3 })
-    .withMessage("Full name must be at least 3 characters long"),
+    .withMessage("Full name cannot be empty"),
   body("email")
     .optional()
     .trim()
@@ -42,9 +81,7 @@ export const userUpdateValidation = [
     .withMessage("Invalid email format"),
   body("phone")
     .optional()
-    .trim()
-    .isLength({ min: 7, max: 20 })
-    .withMessage("Phone number must be between 7 and 20 digits"),
+    .trim(),
   body("password")
     .optional({ checkFalsy: true })
     .trim()
@@ -58,4 +95,3 @@ export const userUpdateValidation = [
 ];
 
 export default userValidation;
-

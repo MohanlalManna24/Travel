@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa6";
 import { FaLock } from "react-icons/fa";
@@ -6,39 +7,92 @@ import { IoMdPerson, IoIosArrowRoundForward } from "react-icons/io";
 import { IoMail } from "react-icons/io5";
 import { MdOutlinePhoneAndroid } from "react-icons/md";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { HiOutlineExclamationCircle, HiOutlineArrowPath } from "react-icons/hi2";
 import travelIllustration from "../../assets/images/img1.jpg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const SingUp = () => {
+const SignUp = () => {
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
+    phone: "",
     password: "",
   });
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+    if (errorMessage) setErrorMessage("");
   };
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    if (formData.password.length < 6) {
+      setErrorMessage("Password must be at least 6 characters long.");
+      return;
+    }
+
+    setLoading(true);
+    setErrorMessage("");
+
+    try {
+      const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+      const response = await axios.post(
+        `${API_URL}/api/users/register`,
+        {
+          fullname: formData.fullName.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          password: formData.password,
+        },
+        {
+          withCredentials: true, // Stores HTTP-only Access & Refresh cookies
+        }
+      );
+
+      if (response.data?.user) {
+        // Save local client state
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        localStorage.setItem("accessToken", response.data.accessToken || "");
+        localStorage.setItem("isLoggedIn", "true");
+
+        // Redirect to profile overview
+        navigate("/profile/overview", { replace: true });
+      } else {
+        throw new Error("Invalid response received from server");
+      }
+    } catch (err) {
+      console.error("Registration failed:", err);
+      const serverError =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        "Registration failed. Please verify your details.";
+      setErrorMessage(serverError);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <main className="min-h-[calc(100vh-5rem)] bg-[#f5f3ed] px-4 py-8 sm:px-6 lg:px-10">
       <div className="mx-auto grid max-w-6xl overflow-hidden rounded-4xl bg-white shadow-[0_24px_80px_rgba(24,50,52,0.12)] lg:grid-cols-[0.9fr_1.1fr]">
+        {/* Left Hero */}
         <div className="relative hidden min-h-170 overflow-hidden bg-[#cde7e3] lg:block">
           <img
             className="absolute inset-0 h-full w-full object-cover mix-blend-multiply opacity-80"
             src={travelIllustration}
             alt="Illustration of famous travel destinations"
           />
-          <div className="absolute inset-0 bg-linear-to-t from-[#123c3e]/90 via-[#123c3e]/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#123c3e]/90 via-[#123c3e]/10 to-transparent" />
           <div className="absolute left-10 right-10 top-10 flex items-center justify-between text-sm font-semibold tracking-[0.18em] text-white uppercase">
             <span>Travel.</span>
             <span className="rounded-full border border-white/50 px-4 py-2 text-xs tracking-[0.12em]">
@@ -58,42 +112,56 @@ const SingUp = () => {
             </p>
           </div>
         </div>
+
+        {/* Right Form */}
         <section className="px-6 py-5 sm:px-12 sm:py-14 lg:px-16 lg:py-10">
-          <div className="mb-10">
+          <div className="mb-8">
             <p className="mb-3 text-xs font-bold tracking-[0.28em] text-[#db8a3c] uppercase">
               Start your journey
             </p>
             <h1 className="text-4xl font-bold tracking-tight text-[#183b3d] sm:text-5xl">
-              Join the travel.
+              Join Ghure Ashi.
             </h1>
             <p className="mt-3 text-sm leading-6 text-[#687878]">
-              Create your account and let the next adventure find you.
+              Create your account and unlock bespoke itineraries & rewards.
             </p>
           </div>
-          <form action="" onSubmit={handleSubmit} className="space-y-5">
+
+          {/* Error Banner */}
+          {errorMessage && (
+            <div className="mb-6 rounded-2xl bg-rose-50 border border-rose-200/80 p-4 text-xs text-rose-800 flex items-start gap-3 animate-in fade-in duration-200">
+              <HiOutlineExclamationCircle className="text-lg text-rose-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold">Registration Notice: </span>
+                <span>{errorMessage}</span>
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
             <label className="block text-sm font-semibold text-[#284b4c]">
               Full name
               <span className="relative mt-2 block">
                 <IoMdPerson className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg text-[#8aa3a0]" />
                 <input
-                  className="h-13 w-full rounded-xl border border-[#d8e2df] bg-[#fbfcfa] pl-12 pr-4 text-sm text-[#183b3d] outline-none transition placeholder:text-[#a7b5b3] focus:border-[#2f7773] focus:ring-4 focus:ring-[#2f7773]/10"
+                  className="h-12 w-full rounded-xl border border-[#d8e2df] bg-[#fbfcfa] pl-12 pr-4 text-sm text-[#183b3d] outline-none transition placeholder:text-[#a7b5b3] focus:border-[#2f7773] focus:ring-4 focus:ring-[#2f7773]/10"
                   type="text"
-                  placeholder="Enter your name here"
+                  placeholder="e.g. Aarav Sharma"
                   value={formData.fullName}
                   name="fullName"
                   onChange={handleInputChange}
                   required
                   autoFocus
-                  pattern="[A-Za-z\s]+"
                 />
               </span>
             </label>
+
             <label className="block text-sm font-semibold text-[#284b4c]">
               Email address
               <span className="relative mt-2 block">
                 <IoMail className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg text-[#8aa3a0]" />
                 <input
-                  className="h-13 w-full rounded-xl border border-[#d8e2df] bg-[#fbfcfa] pl-12 pr-4 text-sm text-[#183b3d] outline-none transition placeholder:text-[#a7b5b3] focus:border-[#2f7773] focus:ring-4 focus:ring-[#2f7773]/10"
+                  className="h-12 w-full rounded-xl border border-[#d8e2df] bg-[#fbfcfa] pl-12 pr-4 text-sm text-[#183b3d] outline-none transition placeholder:text-[#a7b5b3] focus:border-[#2f7773] focus:ring-4 focus:ring-[#2f7773]/10"
                   type="email"
                   placeholder="you@example.com"
                   value={formData.email}
@@ -103,14 +171,15 @@ const SingUp = () => {
                 />
               </span>
             </label>
+
             <label className="block text-sm font-semibold text-[#284b4c]">
               Phone number
               <span className="relative mt-2 block">
                 <MdOutlinePhoneAndroid className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg text-[#8aa3a0]" />
                 <input
-                  className="h-13 w-full rounded-xl border border-[#d8e2df] bg-[#fbfcfa] pl-12 pr-4 text-sm text-[#183b3d] outline-none transition placeholder:text-[#a7b5b3] focus:border-[#2f7773] focus:ring-4 focus:ring-[#2f7773]/10"
+                  className="h-12 w-full rounded-xl border border-[#d8e2df] bg-[#fbfcfa] pl-12 pr-4 text-sm text-[#183b3d] outline-none transition placeholder:text-[#a7b5b3] focus:border-[#2f7773] focus:ring-4 focus:ring-[#2f7773]/10"
                   type="tel"
-                  placeholder="Enter your phone number"
+                  placeholder="+91 98234 11223"
                   value={formData.phone}
                   name="phone"
                   onChange={handleInputChange}
@@ -118,67 +187,79 @@ const SingUp = () => {
                 />
               </span>
             </label>
+
             <label className="block text-sm font-semibold text-[#284b4c]">
               Password
               <span className="relative mt-2 flex items-center">
                 <FaLock className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#8aa3a0]" />
                 <input
-                  className="h-13 w-full rounded-xl border border-[#d8e2df] bg-[#fbfcfa] pl-12 pr-4 text-sm text-[#183b3d] outline-none transition placeholder:text-[#a7b5b3] focus:border-[#2f7773] focus:ring-4 focus:ring-[#2f7773]/10"
+                  className="h-12 w-full rounded-xl border border-[#d8e2df] bg-[#fbfcfa] pl-12 pr-12 text-sm text-[#183b3d] outline-none transition placeholder:text-[#a7b5b3] focus:border-[#2f7773] focus:ring-4 focus:ring-[#2f7773]/10"
                   type={showPassword ? "text" : "password"}
-                  placeholder="At least 8 characters"
+                  placeholder="At least 6 characters"
                   value={formData.password}
                   name="password"
                   onChange={handleInputChange}
+                  required
                 />
-                {showPassword ? (
-                  <FaEye
-                    className="text-2xl -ml-10 cursor-pointer"
-                    onClick={() => setShowPassword(false)}
-                  />
-                ) : (
-                  <FaEyeSlash
-                    className="text-2xl -ml-10 cursor-pointer"
-                    onClick={() => setShowPassword(true)}
-                  />
-                )}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 text-lg text-slate-400 hover:text-slate-600"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
               </span>
             </label>
+
             <button
-              className="group flex h-13 w-full items-center justify-center gap-2 rounded-xl cursor-pointer bg-[#e3a348] text-sm font-bold text-[#183b3d] shadow-[0_10px_24px_rgba(227,163,72,0.24)] transition hover:bg-[#efb45b]"
+              disabled={loading}
+              className="group flex h-13 w-full items-center justify-center gap-2 rounded-xl cursor-pointer bg-[#e3a348] text-sm font-bold text-[#183b3d] shadow-[0_10px_24px_rgba(227,163,72,0.24)] transition hover:bg-[#efb45b] disabled:opacity-50 mt-2"
               type="submit"
             >
-              Create account
-              <IoIosArrowRoundForward className="text-2xl transition-transform group-hover:translate-x-1" />
+              {loading ? (
+                <>
+                  <HiOutlineArrowPath className="animate-spin text-lg" />
+                  <span>Creating Account...</span>
+                </>
+              ) : (
+                <>
+                  <span>Create Account</span>
+                  <IoIosArrowRoundForward className="text-2xl transition-transform group-hover:translate-x-1" />
+                </>
+              )}
             </button>
           </form>
-          <div className="my-8 flex items-center gap-4 text-xs font-medium text-[#91a09e]">
+
+          <div className="my-6 flex items-center gap-4 text-xs font-medium text-[#91a09e]">
             <span className="h-px flex-1 bg-[#e5ebe8]" />
             <span>OR REGISTER WITH</span>
             <span className="h-px flex-1 bg-[#e5ebe8]" />
           </div>
+
           <div className="grid grid-cols-2 gap-3">
             <button
               className="flex h-12 items-center justify-center gap-3 rounded-xl border border-[#d8e2df] text-sm font-semibold text-[#284b4c] transition hover:border-[#2f7773] hover:bg-[#f4f9f7] cursor-pointer"
               type="button"
+              onClick={() => alert("Google OAuth login will be available with live cloud client ID.")}
             >
               <FcGoogle className="text-xl" /> Google
             </button>
             <button
               className="flex h-12 items-center justify-center gap-3 rounded-xl border border-[#d8e2df] text-sm font-semibold text-[#284b4c] transition hover:border-[#2f7773] hover:bg-[#f4f9f7] cursor-pointer"
               type="button"
+              onClick={() => alert("Facebook OAuth login will be available with live client ID.")}
             >
               <FaFacebook className="text-xl text-[#1877f2]" /> Facebook
             </button>
           </div>
-          <p className="mt-8 text-center text-sm text-[#687878]">
-            Already have an account?
+
+          <p className="mt-6 text-center text-sm text-[#687878]">
+            Already have an account?{" "}
             <Link
               to="/auth/signin"
-              className="font-bold text-[#2f7773] cursor-pointer"
+              className="font-bold text-[#2f7773] hover:underline cursor-pointer"
             >
-              <span className="font-bold text-[#2f7773] cursor-pointer">
-                Sign in
-              </span>
+              Sign in
             </Link>
           </p>
         </section>
@@ -187,4 +268,4 @@ const SingUp = () => {
   );
 };
 
-export default SingUp;
+export default SignUp;

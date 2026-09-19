@@ -1,6 +1,22 @@
 import pool from "../db/db.js";
 import bcrypt from "bcrypt";
 
+// Auto ensure refresh_token column exists
+export const ensureRefreshTokenColumn = async () => {
+  try {
+    const [cols] = await pool.query(
+      "SHOW COLUMNS FROM users LIKE 'refresh_token'"
+    );
+    if (cols.length === 0) {
+      await pool.query("ALTER TABLE users ADD COLUMN refresh_token TEXT NULL");
+    }
+  } catch (err) {
+    // If table doesn't exist yet, it's fine
+  }
+};
+
+ensureRefreshTokenColumn();
+
 // 1. Get all users
 export const getAllUsers = async () => {
   const [rows] = await pool.query(
@@ -18,8 +34,49 @@ export const getUserById = async (id) => {
   return rows[0] || null;
 };
 
-// 3. Create user
+// 3. Get user by email with hashed password for auth
+export const getUserByEmailWithPassword = async (email) => {
+  await ensureRefreshTokenColumn();
+  const [rows] = await pool.query(
+    "SELECT id, fullname, email, phone, password, status, refresh_token, created_at, updated_at FROM users WHERE email = ? LIMIT 1",
+    [email]
+  );
+  return rows[0] || null;
+};
+
+// 4. Update user refresh token in DB
+export const updateUserRefreshToken = async (id, refreshToken) => {
+  await ensureRefreshTokenColumn();
+  await pool.query(
+    "UPDATE users SET refresh_token = ? WHERE id = ?",
+    [refreshToken, id]
+  );
+  return true;
+};
+
+// 5. Get user by refresh token
+export const getUserByRefreshToken = async (refreshToken) => {
+  await ensureRefreshTokenColumn();
+  const [rows] = await pool.query(
+    "SELECT id, fullname, email, phone, status, created_at, updated_at FROM users WHERE refresh_token = ? LIMIT 1",
+    [refreshToken]
+  );
+  return rows[0] || null;
+};
+
+// 6. Clear user refresh token (logout)
+export const clearUserRefreshToken = async (id) => {
+  await ensureRefreshTokenColumn();
+  await pool.query(
+    "UPDATE users SET refresh_token = NULL WHERE id = ?",
+    [id]
+  );
+  return true;
+};
+
+// 7. Create user
 export const createUser = async (user) => {
+  await ensureRefreshTokenColumn();
   const { fullname, email, phone, password, status = "active" } = user;
   const hashedPassword = password ? await bcrypt.hash(password, 10) : "";
   const [result] = await pool.query(
@@ -29,7 +86,7 @@ export const createUser = async (user) => {
   return { id: result.insertId, fullname, email, phone, status: status || "active" };
 };
 
-// 4. Check if user already exists
+// 8. Check if user already exists
 export const checkUserExist = async (email, excludeId = null) => {
   if (excludeId) {
     const [rows] = await pool.query(
@@ -45,8 +102,9 @@ export const checkUserExist = async (email, excludeId = null) => {
   return rows.length > 0;
 };
 
-// 5. Update user by id
+// 9. Update user by id
 export const updateUserById = async (id, user) => {
+  await ensureRefreshTokenColumn();
   const { fullname, email, phone, password, status } = user;
   const existingUser = await getUserById(id);
   if (!existingUser) {
@@ -74,9 +132,8 @@ export const updateUserById = async (id, user) => {
   return await getUserById(id);
 };
 
-// 6. Delete user by id
+// 10. Delete user by id
 export const deleteUserById = async (id) => {
-  // First delete associated full details if not handled by foreign key
   try {
     await pool.query("DELETE FROM users_full_details WHERE user_id = ?", [id]);
   } catch (err) {
@@ -90,7 +147,7 @@ export const deleteUserById = async (id) => {
   return result.affectedRows > 0;
 };
 
-// 7. Delete all users
+// 11. Delete all users
 export const deleteAllUsers = async () => {
   try {
     await pool.query("DELETE FROM users_full_details");
@@ -99,4 +156,4 @@ export const deleteAllUsers = async () => {
   }
   const [result] = await pool.query("DELETE FROM users");
   return result.affectedRows > 0;
-};
+};
