@@ -11,6 +11,7 @@ Express and MySQL backend for the Ghure Ashi travel website. This document is th
 | JSON content type | `application/json` |
 | User API prefix | `/api/users` |
 | Full details API prefix | `/api/user-details` |
+| Destinations API prefix | `/api/destinations` |
 
 The final request URL is always:
 
@@ -81,6 +82,7 @@ Apply the schema files in this order:
 
 1. `database/schema/001_users.sql`
 2. `database/schema/002_users_full_details.sql`
+3. `database/schema/003_destination.sql`
 
 Start the server:
 
@@ -139,6 +141,15 @@ Replace `:userId` with a real ID, for example `/update/2`.
 | `GET` | `/api/user-details` | Get all full details |
 | `GET` | `/api/user-details/:userId` | Get full details by user ID |
 | `PUT` | `/api/user-details/update/:userId` | Update full details by user ID |
+
+### Destinations
+
+| Method | URL | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/destinations/create` | Create a destination |
+| `GET` | `/api/destinations` | Get all destinations |
+| `PUT` | `/api/destinations/update/:id` | Update a destination |
+| `DELETE` | `/api/destinations/delete/:id` | Delete a destination |
 
 ## Request Examples
 
@@ -262,6 +273,40 @@ PUT http://localhost:3000/api/user-details/update/2
 }
 ```
 
+### Create a destination
+
+```http
+POST http://localhost:3000/api/destinations/create
+```
+
+```json
+{
+	"title": "Goa Beach Escape",
+	"description": "A relaxing trip along the coast.",
+	"image": "https://example.com/goa.jpg",
+	"country": "India",
+	"state": "Goa",
+	"status": "active",
+	"price": 25000,
+	"days": 5
+}
+```
+
+### Get all destinations
+
+```http
+GET http://localhost:3000/api/destinations
+```
+
+### Update or delete a destination
+
+Replace `:id` with the destination ID returned by the database.
+
+```http
+PUT http://localhost:3000/api/destinations/update/1
+DELETE http://localhost:3000/api/destinations/delete/1
+```
+
 ## Validation Rules
 
 ### User fields
@@ -278,6 +323,12 @@ PUT http://localhost:3000/api/user-details/update/2
 - `DOB` must be an ISO date such as `1998-05-15`.
 - Optional fields may be omitted or sent as an empty value.
 - The ID for update and read operations comes from the URL parameter.
+
+### Destination fields
+
+- `title`, `image`, `price`, and `days` are required.
+- `description`, `state`, and `country` are text fields; `country` defaults to `India` in the database.
+- `status` must be `active` or `inactive` and defaults to `active` in the database.
 
 Validation failures return HTTP `400`:
 
