@@ -1,5 +1,6 @@
 import React from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useAdminAuthStore } from "../../zustand/adminAuthStore";
 import {
   HiOutlineSquares2X2,
   HiOutlineTicket,
@@ -203,6 +204,14 @@ const MobileNavItem = ({ item, isActive }) => {
 // =========================================================================
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logoutAdmin } = useAdminAuthStore();
+
+  const handleSignOut = async (e) => {
+    e.preventDefault();
+    await logoutAdmin();
+    navigate("/admin/login");
+  };
 
   // Helper to determine if current route matches item path or altPaths
   const isLinkActive = (path, altPaths = []) => {
@@ -249,46 +258,52 @@ const Sidebar = () => {
                   className="absolute -bottom-1 -right-1 flex h-3 w-3 items-center justify-center"
                   aria-label="System status: online"
                 >
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex h-3 w-3 rounded-full border-2 border-slate-950 bg-emerald-500" />
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-slate-950" />
                 </span>
               </div>
-              <div className="flex flex-col">
-                <span className="font-serif text-lg font-extrabold uppercase tracking-wider text-white">
-                  GHURE<span className="font-sans text-cyan-400">ASHI</span>
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
-                  Executive Suite
-                </span>
+
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-serif text-lg font-bold tracking-tight text-white group-hover:text-cyan-300 transition-colors">
+                    GHURE ASHI
+                  </span>
+                  <span className="rounded-md bg-cyan-500/20 px-1.5 py-0.5 text-[9px] font-bold text-cyan-400 border border-cyan-500/30">
+                    ADMIN
+                  </span>
+                </div>
+                <p className="text-[11px] font-medium text-slate-400">
+                  Control Center
+                </p>
               </div>
             </Link>
-
-            <span className="rounded-full border border-cyan-500/30 bg-cyan-950/40 px-2 py-0.5 text-[10px] font-medium tracking-wide text-cyan-300 shadow-xs">
-              PRO
-            </span>
           </div>
 
-          {/* Quick Action Button */}
-          <button
-            type="button"
-            className="group relative mt-2 flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-xl bg-linear-to-r from-cyan-600 via-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-cyan-500/20 transition-all duration-300 hover:brightness-110 hover:shadow-cyan-500/40 active:scale-[0.98]"
-          >
-            <div className="absolute inset-0 bg-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-            <HiOutlinePlus className="text-lg transition-transform duration-300 group-hover:rotate-90" />
-            <span className="font-semibold tracking-wide">Create New Trip</span>
-          </button>
+          {/* Quick Stats or Environment Badge */}
+          <div className="flex items-center justify-between rounded-xl border border-slate-800/80 bg-slate-900/60 p-3 shadow-inner">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400">
+                <HiOutlineSquares2X2 className="text-sm" />
+              </div>
+              <div>
+                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                  Admin Session
+                </p>
+                <p className="text-xs font-bold text-slate-200">
+                  Active & Protected
+                </p>
+              </div>
+            </div>
+            <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+          </div>
         </div>
 
-        {/* Middle Navigation Menu with Custom Scrollbar */}
-        <div className="relative z-10 flex-1 overflow-y-auto px-4 py-2 scrollbar-thin scrollbar-thumb-slate-800 hover:scrollbar-thumb-slate-700">
-          {ADMIN_NAV_GROUPS.map((group, groupIdx) => (
-            <div
-              key={group.groupTitle}
-              className={groupIdx > 0 ? "mt-5" : "mt-2"}
-            >
-              <h4 className="px-3 pb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">
+        {/* Middle Scrollable Navigation List */}
+        <div className="custom-scrollbar relative z-10 flex-1 space-y-6 overflow-y-auto px-4 py-4">
+          {ADMIN_NAV_GROUPS.map((group) => (
+            <div key={group.groupTitle} className="space-y-1.5">
+              <h3 className="px-3 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
                 {group.groupTitle}
-              </h4>
+              </h3>
               <ul className="space-y-1">
                 {group.items.map((item) => (
                   <DesktopNavItem
@@ -305,13 +320,14 @@ const Sidebar = () => {
         {/* Bottom Footer Actions & Logout */}
         <div className="relative z-10 space-y-2 border-t border-slate-800/80 bg-slate-950/90 p-4">
           {/* Logout Button */}
-          <Link
-            to="/"
+          <button
+            type="button"
+            onClick={handleSignOut}
             className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-rose-500/20 bg-rose-950/20 px-4 py-2.5 text-xs font-semibold text-rose-300 transition-all duration-300 hover:border-rose-500/40 hover:bg-rose-900/30 hover:text-rose-200 hover:shadow-lg hover:shadow-rose-950/40 active:scale-[0.98]"
           >
             <HiOutlineArrowLeftOnRectangle className="text-base transition-transform duration-300 group-hover:-translate-x-1" />
             <span>Sign Out Session</span>
-          </Link>
+          </button>
 
           {/* Status & Version Footer */}
           <div className="flex items-center justify-between px-1 pt-1 text-[10px] text-slate-400">
@@ -339,14 +355,15 @@ const Sidebar = () => {
 
           {/* Quick Exit to Home on Mobile */}
           <li className="flex-1">
-            <Link
-              to="/"
-              className="flex flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-medium text-rose-400 transition-all duration-200 hover:bg-rose-950/30"
-              title="Exit to Site"
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="flex w-full flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-medium text-rose-400 transition-all duration-200 hover:bg-rose-950/30 cursor-pointer"
+              title="Sign Out Session"
             >
               <HiOutlineArrowLeftOnRectangle className="text-xl" />
-              <span className="scale-90">Exit</span>
-            </Link>
+              <span className="scale-90">Logout</span>
+            </button>
           </li>
         </ul>
       </nav>

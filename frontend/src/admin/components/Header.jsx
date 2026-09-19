@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAdminAuthStore } from "../../zustand/adminAuthStore";
 import {
   HiOutlineMagnifyingGlass,
   HiOutlineBell,
@@ -69,15 +70,25 @@ export const NotificationBell = ({ count = 3, onClick }) => {
  * 3. User Profile Card & Dropdown Menu
  */
 export const UserProfileBadge = ({
-  user = {
-    name: "Mohanlal Manna",
-    role: "Super Administrator",
+  user = null,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const { admin, logoutAdmin } = useAdminAuthStore();
+
+  const currentAdmin = user || {
+    name: admin?.fullname || admin?.username || "Super Administrator",
+    role: admin?.role === "admin" ? "Master Administrator" : "Administrator",
     avatar:
       "https://mohanlalmanna.vercel.app/assets/profileImg-DNYu86pM.png",
     status: "online",
-  },
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
+  };
+
+  const handleSignOut = async () => {
+    setIsOpen(false);
+    await logoutAdmin();
+    navigate("/admin/login");
+  };
 
   return (
     <div className="relative">
@@ -89,11 +100,11 @@ export const UserProfileBadge = ({
       >
         <div className="relative">
           <img
-            src={user.avatar}
-            alt={user.name}
+            src={currentAdmin.avatar}
+            alt={currentAdmin.name}
             className="h-9 w-9 rounded-xl object-cover ring-2 ring-cyan-500/30"
           />
-          {user.status === "online" && (
+          {currentAdmin.status === "online" && (
             <span className="absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500" />
           )}
         </div>
@@ -101,12 +112,12 @@ export const UserProfileBadge = ({
         <div className="hidden flex-col text-left sm:flex">
           <div className="flex items-center gap-1">
             <span className="max-w-30 truncate text-xs font-bold text-slate-800">
-              {user.name}
+              {currentAdmin.name}
             </span>
             <HiOutlineSparkles className="text-xs text-amber-500" />
           </div>
           <span className="text-[10px] font-medium text-slate-400">
-            {user.role}
+            {currentAdmin.role}
           </span>
         </div>
 
@@ -130,11 +141,11 @@ export const UserProfileBadge = ({
             {/* Header snippet */}
             <div className="border-b border-slate-100 px-3 py-2.5">
               <p className="text-xs font-semibold text-slate-800">
-                {user.name}
+                {currentAdmin.name}
               </p>
               <p className="flex items-center gap-1 text-[11px] text-cyan-600 font-medium mt-0.5">
                 <HiOutlineShieldCheck />
-                {user.role}
+                {currentAdmin.role}
               </p>
             </div>
 
@@ -163,14 +174,14 @@ export const UserProfileBadge = ({
 
             {/* Logout Footer */}
             <div className="border-t border-slate-100 mt-1.5 pt-1.5">
-              <Link
-                to="/"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-rose-600 transition-colors hover:bg-rose-50"
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-rose-600 transition-colors hover:bg-rose-50"
               >
                 <HiOutlineArrowLeftOnRectangle className="text-base" />
                 Sign Out
-              </Link>
+              </button>
             </div>
           </div>
         </>

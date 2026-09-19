@@ -5,6 +5,7 @@ import userFullDetails from "./routes/userFullDetails.routes.js";
 import destinations from "./routes/destinations.routes.js";
 import bookingsRoutes from "./routes/bookings.routes.js";
 import notificationsRoutes from "./routes/notifications.routes.js";
+import adminAuthRoutes from "./routes/adminAuth.routes.js";
 import cors from "cors";
 
 const app = express();
@@ -15,6 +16,8 @@ app.use(cors({
     origin: "http://localhost:5173",
     credentials: true,
 }));
+
+app.use("/api/admin/auth", adminAuthRoutes);
 
 app.use("/api/users", userRoutes);
 

@@ -16,6 +16,8 @@ import Overview from "./pages/MyProfile/Overview.jsx";
 import Trips from "./pages/MyProfile/Trips.jsx";
 import ProfileDetails from "./pages/MyProfile/ProfileDetails.jsx";
 import AdminLayout from "./admin/components/AdminLayout.jsx";
+import AdminProtectedRoute from "./admin/components/AdminProtectedRoute.jsx";
+import AdminLogin from "./admin/page/AdminLogin.jsx";
 import Dashboard from "./admin/page/Dashboard.jsx";
 import TripManagement from "./admin/page/TripManagement.jsx";
 import UserManagement from "./admin/page/UserManagement.jsx";
@@ -52,18 +54,27 @@ const router = createBrowserRouter([
     ],
   },
   {
+    path: "/admin/login",
+    element: <AdminLogin />,
+  },
+  {
     path: "/admin",
-    element: <AdminLayout />,
+    element: <AdminProtectedRoute />,
     children: [
-      { index: true, element: <Dashboard /> },
-      { path: "dashboard", element: <Dashboard /> },
-      { path: "trips", element: <TripManagement /> },
-      { path: "users", element: <UserManagement /> },
-      { path: "bookings", element: <BookingManagement /> },
-      { path: "payments", element: <PaymentAndRevenue /> },
-      { path: "notifications", element: <Notification /> },
-      { path: "settings", element: <Settings /> },
-      { path: "*", element: <Dashboard /> },
+      {
+        element: <AdminLayout />,
+        children: [
+          { index: true, element: <Dashboard /> },
+          { path: "dashboard", element: <Dashboard /> },
+          { path: "trips", element: <TripManagement /> },
+          { path: "users", element: <UserManagement /> },
+          { path: "bookings", element: <BookingManagement /> },
+          { path: "payments", element: <PaymentAndRevenue /> },
+          { path: "notifications", element: <Notification /> },
+          { path: "settings", element: <Settings /> },
+          { path: "*", element: <Dashboard /> },
+        ],
+      },
     ],
   },
 ]);
