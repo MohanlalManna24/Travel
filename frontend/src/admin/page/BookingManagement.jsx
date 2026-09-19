@@ -248,7 +248,9 @@ const BookingManagement = () => {
       if (modalMode === "create") {
         let created = null;
         try {
-          const res = await axios.post(`${API_BASE_URL}/api/bookings`, payload);
+          const res = await axios.post(`${API_BASE_URL}/api/bookings`, payload, {
+            withCredentials: true,
+          });
           if (res.data?.booking || res.data?.data) {
             created = res.data.booking || res.data.data;
           }
@@ -260,14 +262,24 @@ const BookingManagement = () => {
         setBookings((prev) => [finalBooking, ...prev]);
         showToast(`Booking #${payload.id} successfully created!`, "success");
       } else {
-        const targetId = payload.id;
+        const targetId = payload.db_id || payload.bookingReference || payload.id;
+        let updatedBooking = payload;
         try {
-          await axios.put(`${API_BASE_URL}/api/bookings/${targetId}`, payload);
+          const res = await axios.put(`${API_BASE_URL}/api/bookings/${targetId}`, payload, {
+            withCredentials: true,
+          });
+          if (res.data?.booking || res.data?.data) {
+            updatedBooking = res.data.booking || res.data.data;
+          }
         } catch (apiErr) {
           console.warn(`PUT /api/bookings/${targetId} failed:`, apiErr);
         }
 
-        setBookings((prev) => prev.map((b) => (b.id === payload.id ? payload : b)));
+        setBookings((prev) =>
+          prev.map((b) =>
+            b.id === payload.id || b.db_id === payload.db_id ? updatedBooking : b
+          )
+        );
         showToast(`Booking #${payload.id} updated!`, "success");
       }
 
@@ -285,13 +297,18 @@ const BookingManagement = () => {
     setDeleting(true);
 
     try {
+      const target = bookings.find((b) => b.id === id || b.db_id === id);
+      const targetId = target?.db_id || target?.bookingReference || id;
+
       try {
-        await axios.delete(`${API_BASE_URL}/api/bookings/${id}`);
+        await axios.delete(`${API_BASE_URL}/api/bookings/${targetId}`, {
+          withCredentials: true,
+        });
       } catch (apiErr) {
-        console.warn(`DELETE /api/bookings/${id} failed:`, apiErr);
+        console.warn(`DELETE /api/bookings/${targetId} failed:`, apiErr);
       }
 
-      setBookings((prev) => prev.filter((b) => b.id !== id));
+      setBookings((prev) => prev.filter((b) => b.id !== id && b.db_id !== id));
       setDeleteConfirmId(null);
       showToast(`Reservation #${id} was cancelled & removed.`, "success");
     } catch (err) {

@@ -1,5 +1,29 @@
 import pool from "../db/db.js";
 
+// Helper to reliably format MySQL Date or input date string to YYYY-MM-DD
+export const formatDateToISO = (dateVal) => {
+  if (!dateVal) return null;
+  if (dateVal instanceof Date) {
+    if (isNaN(dateVal.getTime())) return null;
+    const year = dateVal.getFullYear();
+    const month = String(dateVal.getMonth() + 1).padStart(2, "0");
+    const day = String(dateVal.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+  const str = String(dateVal).trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+    return str.slice(0, 10);
+  }
+  const parsed = new Date(str);
+  if (!isNaN(parsed.getTime())) {
+    const year = parsed.getFullYear();
+    const month = String(parsed.getMonth() + 1).padStart(2, "0");
+    const day = String(parsed.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+  return str.slice(0, 10);
+};
+
 // Helper to normalize and map DB rows to frontend-friendly nested structure
 export const mapBookingRow = (row) => {
   if (!row) return null;
@@ -22,8 +46,8 @@ export const mapBookingRow = (row) => {
       location: row.destination_location || "",
       image: row.destination_image || "",
     },
-    startDate: row.start_date ? String(row.start_date).slice(0, 10) : "",
-    endDate: row.end_date ? String(row.end_date).slice(0, 10) : "",
+    startDate: formatDateToISO(row.start_date) || "",
+    endDate: formatDateToISO(row.end_date) || "",
     guests: Number(row.guests || 1),
     totalAmount: Number(row.total_amount || 0),
     paymentStatus: row.payment_status || "Pending",
@@ -76,6 +100,9 @@ export const createBooking = async (bookingData) => {
   const destLoc = destinationLocation || destination.location || "";
   const destImg = destinationImage || destination.image || "";
 
+  const sDate = formatDateToISO(startDate) || formatDateToISO(new Date());
+  const eDate = formatDateToISO(endDate) || formatDateToISO(new Date());
+
   const [result] = await pool.query(
     `INSERT INTO bookings (
       booking_reference,
@@ -111,8 +138,8 @@ export const createBooking = async (bookingData) => {
       destName,
       destLoc,
       destImg,
-      startDate,
-      endDate,
+      sDate,
+      eDate,
       Number(guests || 1),
       Number(totalAmount || 0),
       paymentStatus,
@@ -132,10 +159,17 @@ export const getAllBookings = async () => {
 };
 
 export const getBookingByIdOrRef = async (idOrRef) => {
-  const [rows] = await pool.query(
-    "SELECT * FROM bookings WHERE id = ? OR booking_reference = ? LIMIT 1",
-    [idOrRef, idOrRef]
-  );
+  if (!idOrRef) return null;
+
+  let query = "SELECT * FROM bookings WHERE booking_reference = ? LIMIT 1";
+  let params = [String(idOrRef)];
+
+  if (!isNaN(Number(idOrRef)) && !String(idOrRef).startsWith("BKG-")) {
+    query = "SELECT * FROM bookings WHERE id = ? OR booking_reference = ? LIMIT 1";
+    params = [Number(idOrRef), String(idOrRef)];
+  }
+
+  const [rows] = await pool.query(query, params);
   return rows.length > 0 ? mapBookingRow(rows[0]) : null;
 };
 
@@ -175,8 +209,8 @@ export const updateBooking = async (idOrRef, updateData) => {
   const destLoc = destinationLocation !== undefined ? destinationLocation : (destination.location !== undefined ? destination.location : existing.destination.location);
   const destImg = destinationImage !== undefined ? destinationImage : (destination.image !== undefined ? destination.image : existing.destination.image);
 
-  const sDate = startDate !== undefined ? startDate : existing.startDate;
-  const eDate = endDate !== undefined ? endDate : existing.endDate;
+  const sDate = startDate ? formatDateToISO(startDate) : formatDateToISO(existing.startDate);
+  const eDate = endDate ? formatDateToISO(endDate) : formatDateToISO(existing.endDate);
   const numGuests = guests !== undefined ? Number(guests) : existing.guests;
   const amount = totalAmount !== undefined ? Number(totalAmount) : existing.totalAmount;
   const payStatus = paymentStatus !== undefined ? paymentStatus : existing.paymentStatus;
@@ -204,7 +238,7 @@ export const updateBooking = async (idOrRef, updateData) => {
       transaction_id = ?,
       booking_status = ?,
       special_notes = ?
-    WHERE id = ? OR booking_reference = ?`,
+    WHERE id = ?`,
     [
       name,
       email,
@@ -224,7 +258,6 @@ export const updateBooking = async (idOrRef, updateData) => {
       bkgStatus,
       notes,
       existing.db_id,
-      existing.bookingReference,
     ]
   );
 
@@ -232,9 +265,16 @@ export const updateBooking = async (idOrRef, updateData) => {
 };
 
 export const deleteBooking = async (idOrRef) => {
-  const [result] = await pool.query(
-    "DELETE FROM bookings WHERE id = ? OR booking_reference = ?",
-    [idOrRef, idOrRef]
-  );
+  if (!idOrRef) return false;
+
+  let query = "DELETE FROM bookings WHERE booking_reference = ?";
+  let params = [String(idOrRef)];
+
+  if (!isNaN(Number(idOrRef)) && !String(idOrRef).startsWith("BKG-")) {
+    query = "DELETE FROM bookings WHERE id = ? OR booking_reference = ?";
+    params = [Number(idOrRef), String(idOrRef)];
+  }
+
+  const [result] = await pool.query(query, params);
   return result.affectedRows > 0;
 };
