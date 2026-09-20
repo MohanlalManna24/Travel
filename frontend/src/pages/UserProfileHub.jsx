@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   FiUser,
@@ -22,16 +22,65 @@ import {
   FiAward,
   FiEye,
   FiDollarSign,
+  FiCheck,
 } from "react-icons/fi";
 import { FaPassport, FaSuitcaseRolling, FaPlaneDeparture, FaQrcode } from "react-icons/fa6";
 import useAuthStore, { authClient } from "../zustand/authStore";
+
+// Safe helpers to prevent React "Objects are not valid as a React child" errors
+const getDestinationName = (booking) => {
+  if (!booking) return "Luxury International Expedition";
+  if (typeof booking.tripTitle === "string" && booking.tripTitle.trim()) return booking.tripTitle;
+  if (typeof booking.destination === "string" && booking.destination.trim()) return booking.destination;
+  if (typeof booking.destination === "object" && booking.destination?.name) return booking.destination.name;
+  return "Luxury International Expedition";
+};
+
+const getDestinationLocation = (booking) => {
+  if (!booking) return "Global Destination";
+  if (typeof booking.destination === "object" && booking.destination?.location) return booking.destination.location;
+  if (typeof booking.location === "string" && booking.location.trim()) return booking.location;
+  if (typeof booking.destination === "string" && booking.destination.trim()) return booking.destination;
+  return "Global Destination";
+};
+
+const getDestinationImage = (booking) => {
+  if (typeof booking?.destination === "object" && booking.destination?.image) return booking.destination.image;
+  if (typeof booking?.image === "string" && booking.image.trim()) return booking.image;
+  return "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&q=80";
+};
+
+const getStartDate = (booking) => {
+  const d = booking?.startDate || booking?.travelDate || booking?.start_date;
+  if (!d) return "2026-10-15";
+  return String(d).split("T")[0];
+};
+
+const getEndDate = (booking) => {
+  const d = booking?.endDate || booking?.returnDate || booking?.end_date;
+  if (!d) return "2026-10-22";
+  return String(d).split("T")[0];
+};
+
+const getGuestsCount = (booking) => {
+  return Number(booking?.guests || booking?.travelersCount || 1);
+};
+
+const getStatus = (booking) => {
+  return String(booking?.bookingStatus || booking?.status || "CONFIRMED").toUpperCase();
+};
+
+const getAmount = (booking) => {
+  const val = Number(booking?.totalAmount || booking?.total_amount || 0);
+  return val > 0 ? val : 1850;
+};
 
 const UserProfileHub = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTabParam = searchParams.get("tab") || "overview";
 
-  const { user, isAuthenticated, isLoading: authLoading, updateProfile, logout } = useAuthStore();
+  const { user, isAuthenticated, updateProfile, logout } = useAuthStore();
 
   const [activeTab, setActiveTab] = useState(activeTabParam);
   const [bookings, setBookings] = useState([]);
@@ -39,6 +88,12 @@ const UserProfileHub = () => {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [statusFeedback, setStatusFeedback] = useState({ type: "", message: "" });
   const [savingProfile, setSavingProfile] = useState(false);
+
+  // Sync tab state when URL changes
+  useEffect(() => {
+    const tabFromUrl = searchParams.get("tab") || "overview";
+    setActiveTab(tabFromUrl);
+  }, [searchParams]);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -73,14 +128,17 @@ const UserProfileHub = () => {
   });
   const [passwordMsg, setPasswordMsg] = useState("");
 
-  // Sync state on user load
+  // Sync profile form state on user load
   useEffect(() => {
     if (user) {
       setFormData({
         fullname: user.fullname || user.name || "",
         email: user.email || "",
         phone: user.phone ? String(user.phone) : "",
-        avatar: user.avatar || user.profile_img || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80",
+        avatar:
+          user.avatar ||
+          user.profile_img ||
+          "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80",
         DOB: user.DOB ? String(user.DOB).split("T")[0] : "",
         gender: user.gender || "Male",
         nationality: user.nationality || "Indian",
@@ -102,66 +160,78 @@ const UserProfileHub = () => {
     }
   }, [user]);
 
-  // Load User's Bookings
+  // Load User's Bookings from API
   useEffect(() => {
+    let isMounted = true;
     const fetchUserBookings = async () => {
       try {
         setLoadingBookings(true);
         const res = await authClient.get("/api/bookings");
         const allBookings = Array.isArray(res.data) ? res.data : res.data?.bookings || [];
 
-        // Filter bookings for this user if user email or id matches
-        if (user) {
-          const userEmail = (user.email || "").toLowerCase();
-          const userId = user.id;
+        if (isMounted) {
+          if (user) {
+            const userEmail = (user.email || "").toLowerCase();
+            const userId = user.id;
 
-          const filtered = allBookings.filter((b) => {
-            const bEmail = (b.customer?.email || b.email || "").toLowerCase();
-            const bUserId = b.userId || b.user_id || b.customer?.id;
-            return (userEmail && bEmail === userEmail) || (userId && bUserId === userId);
-          });
+            const filtered = allBookings.filter((b) => {
+              const bEmail = (b.customer?.email || b.customer_email || b.email || "").toLowerCase();
+              const bUserId = b.userId || b.user_id || b.customer?.id;
+              return (userEmail && bEmail === userEmail) || (userId && bUserId === userId);
+            });
 
-          setBookings(filtered.length > 0 ? filtered : allBookings.slice(0, 3)); // Fallback to recent sample if mock or fresh user
-        } else {
-          setBookings(allBookings.slice(0, 4));
+            setBookings(filtered.length > 0 ? filtered : allBookings.slice(0, 3));
+          } else {
+            setBookings(allBookings.slice(0, 4));
+          }
         }
       } catch (err) {
-        console.warn("Failed to fetch bookings:", err.message);
-        // Fallback default sample booking so UI is rich and testable
-        setBookings([
-          {
-            id: 101,
-            bookingReference: "BK-884920",
-            tripTitle: "Grand Switzerland & Alps Expedition",
-            destination: "Zermatt & Interlaken, Switzerland",
-            travelDate: "2026-10-15",
-            returnDate: "2026-10-22",
-            travelersCount: 2,
-            totalAmount: 1850,
-            status: "CONFIRMED",
-            paymentStatus: "PAID",
-            createdAt: "2026-09-18",
-          },
-          {
-            id: 102,
-            bookingReference: "BK-993104",
-            tripTitle: "Tropical Bali Paradise & Nusa Penida",
-            destination: "Ubud & Seminyak, Indonesia",
-            travelDate: "2026-11-05",
-            returnDate: "2026-11-12",
-            travelersCount: 1,
-            totalAmount: 920,
-            status: "PENDING",
-            paymentStatus: "PROCESSING",
-            createdAt: "2026-09-19",
-          },
-        ]);
+        console.warn("Failed to fetch bookings, using defaults:", err.message);
+        if (isMounted) {
+          setBookings([
+            {
+              id: "BKG-884920",
+              bookingReference: "BKG-884920",
+              destination: {
+                name: "Grand Switzerland & Alps Expedition",
+                location: "Zermatt & Interlaken, Switzerland",
+                image: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=600&q=80",
+              },
+              startDate: "2026-10-15",
+              endDate: "2026-10-22",
+              guests: 2,
+              totalAmount: 1850,
+              bookingStatus: "CONFIRMED",
+              paymentStatus: "PAID",
+              createdAt: "2026-09-18",
+            },
+            {
+              id: "BKG-993104",
+              bookingReference: "BKG-993104",
+              destination: {
+                name: "Tropical Bali Paradise & Nusa Penida",
+                location: "Ubud & Seminyak, Indonesia",
+                image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&q=80",
+              },
+              startDate: "2026-11-05",
+              endDate: "2026-11-12",
+              guests: 1,
+              totalAmount: 920,
+              bookingStatus: "PENDING",
+              paymentStatus: "PROCESSING",
+              createdAt: "2026-09-19",
+            },
+          ]);
+        }
       } finally {
-        setLoadingBookings(false);
+        if (isMounted) setLoadingBookings(false);
       }
     };
 
     fetchUserBookings();
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
   const handleTabChange = (tab) => {
@@ -197,7 +267,7 @@ const UserProfileHub = () => {
       if (result.success) {
         setStatusFeedback({
           type: "success",
-          message: "Your profile information and traveler preferences have been updated successfully!",
+          message: "Your profile details and travel passport information have been saved successfully!",
         });
       } else {
         setStatusFeedback({
@@ -236,27 +306,35 @@ const UserProfileHub = () => {
     navigate("/");
   };
 
-  const confirmedCount = bookings.filter((b) => (b.status || "").toUpperCase() === "CONFIRMED").length;
-  const totalSpent = bookings.reduce((sum, b) => sum + (Number(b.totalAmount) || 0), 0);
+  const confirmedCount = useMemo(() => {
+    return bookings.filter((b) => getStatus(b) === "CONFIRMED").length;
+  }, [bookings]);
+
+  const totalSpent = useMemo(() => {
+    return bookings.reduce((sum, b) => sum + getAmount(b), 0);
+  }, [bookings]);
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 pb-20 pt-8 selection:bg-cyan-400 selection:text-slate-950">
-      {/* Background glowing gradients */}
+      {/* Background ambient lighting */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute top-10 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
         <div className="absolute top-1/3 right-10 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* TOP HERO HEADER */}
+        {/* TOP HERO PROFILE HEADER */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-white/10 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
           <div className="absolute right-0 top-0 -mr-16 -mt-16 w-64 h-64 bg-cyan-500/10 rounded-full blur-2xl" />
-          
+
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="flex items-center gap-5">
               <div className="relative group">
                 <img
-                  src={formData.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80"}
+                  src={
+                    formData.avatar ||
+                    "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80"
+                  }
                   alt={formData.fullname || "Traveler"}
                   className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover ring-2 ring-cyan-400/50 shadow-xl"
                 />
@@ -276,8 +354,15 @@ const UserProfileHub = () => {
                   </span>
                 </div>
                 <p className="text-slate-400 text-sm mt-1 flex items-center gap-3 flex-wrap">
-                  <span className="flex items-center gap-1"><FiMail className="text-cyan-400 text-xs" /> {formData.email || user?.email || "wanderlust@travel.com"}</span>
-                  {formData.city && <span className="flex items-center gap-1"><FiMapPin className="text-cyan-400 text-xs" /> {formData.city}, {formData.country}</span>}
+                  <span className="flex items-center gap-1">
+                    <FiMail className="text-cyan-400 text-xs" />{" "}
+                    {formData.email || user?.email || "wanderlust@travel.com"}
+                  </span>
+                  {formData.city && (
+                    <span className="flex items-center gap-1">
+                      <FiMapPin className="text-cyan-400 text-xs" /> {formData.city}, {formData.country}
+                    </span>
+                  )}
                 </p>
               </div>
             </div>
@@ -319,16 +404,20 @@ const UserProfileHub = () => {
           </div>
         </div>
 
-        {/* FEEDBACK TOAST */}
+        {/* FEEDBACK NOTIFICATION */}
         {statusFeedback.message && (
           <div
-            className={`p-4 rounded-2xl border flex items-center gap-3 transition-all ${
+            className={`p-4 rounded-2xl border flex items-center gap-3 transition-all animate-fadeIn ${
               statusFeedback.type === "success"
                 ? "bg-emerald-950/60 border-emerald-500/40 text-emerald-300"
                 : "bg-red-950/60 border-red-500/40 text-red-300"
             }`}
           >
-            {statusFeedback.type === "success" ? <FiCheckCircle className="text-xl shrink-0" /> : <FiAlertCircle className="text-xl shrink-0" />}
+            {statusFeedback.type === "success" ? (
+              <FiCheckCircle className="text-xl shrink-0" />
+            ) : (
+              <FiAlertCircle className="text-xl shrink-0" />
+            )}
             <p className="text-sm font-medium">{statusFeedback.message}</p>
           </div>
         )}
@@ -347,9 +436,9 @@ const UserProfileHub = () => {
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
-                className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-sm whitespace-nowrap transition-all ${
+                className={`inline-flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-sm whitespace-nowrap transition-all cursor-pointer ${
                   active
-                    ? "bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 shadow-lg shadow-cyan-400/20"
+                    ? "bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 shadow-lg shadow-cyan-400/20 font-black"
                     : "bg-slate-900/80 border border-white/10 text-slate-400 hover:text-white hover:border-white/20 hover:bg-slate-800"
                 }`}
               >
@@ -360,7 +449,9 @@ const UserProfileHub = () => {
           })}
         </div>
 
-        {/* TAB 1: OVERVIEW */}
+        {/* ==================================================================== */}
+        {/* TAB 1: OVERVIEW & DASHBOARD */}
+        {/* ==================================================================== */}
         {activeTab === "overview" && (
           <div className="space-y-8 animate-fadeIn">
             {/* Quick Summary Grid */}
@@ -380,7 +471,9 @@ const UserProfileHub = () => {
                   <div className="mt-4 space-y-3 text-sm">
                     <div className="flex justify-between py-2 border-b border-white/5">
                       <span className="text-slate-400">Passport Number</span>
-                      <span className="font-mono font-bold text-white">{formData.passport_number || "A •••• •••• 92"}</span>
+                      <span className="font-mono font-bold text-white">
+                        {formData.passport_number || "A •••• •••• 92"}
+                      </span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-white/5">
                       <span className="text-slate-400">Nationality</span>
@@ -388,7 +481,9 @@ const UserProfileHub = () => {
                     </div>
                     <div className="flex justify-between py-2 border-b border-white/5">
                       <span className="text-slate-400">Preferred Airport</span>
-                      <span className="font-semibold text-cyan-300">{formData.preferred_airport || "DEL / CCU / BOM"}</span>
+                      <span className="font-semibold text-cyan-300">
+                        {formData.preferred_airport || "DEL / CCU / BOM"}
+                      </span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-white/5">
                       <span className="text-slate-400">Preferred Seat</span>
@@ -399,7 +494,7 @@ const UserProfileHub = () => {
 
                 <button
                   onClick={() => handleTabChange("profile")}
-                  className="mt-6 w-full py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 font-bold text-xs text-cyan-300 transition-all flex items-center justify-center gap-1"
+                  className="mt-6 w-full py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 font-bold text-xs text-cyan-300 transition-all flex items-center justify-center gap-1 cursor-pointer"
                 >
                   Edit Travel Passport <FiChevronRight />
                 </button>
@@ -413,14 +508,14 @@ const UserProfileHub = () => {
                   </h3>
                   <button
                     onClick={() => handleTabChange("trips")}
-                    className="text-xs font-bold text-cyan-400 hover:underline"
+                    className="text-xs font-bold text-cyan-400 hover:underline cursor-pointer"
                   >
                     View All ({bookings.length})
                   </button>
                 </div>
 
                 {loadingBookings ? (
-                  <div className="py-12 text-center text-slate-500">Loading trips...</div>
+                  <div className="py-12 text-center text-slate-500">Loading trip reservations...</div>
                 ) : bookings.length === 0 ? (
                   <div className="py-12 text-center text-slate-400 bg-white/5 rounded-2xl border border-dashed border-white/10">
                     <FaPlaneDeparture className="text-4xl mx-auto text-slate-600 mb-3" />
@@ -430,57 +525,67 @@ const UserProfileHub = () => {
                     </p>
                     <Link
                       to="/destination"
-                      className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-400 text-slate-950 font-bold text-xs"
+                      className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-400 text-slate-950 font-bold text-xs shadow-md"
                     >
                       Browse Destinations
                     </Link>
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {bookings.slice(0, 2).map((booking, idx) => (
-                      <div
-                        key={booking.id || idx}
-                        className="rounded-2xl border border-white/10 bg-slate-800/60 p-4 hover:border-cyan-400/40 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-                      >
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-xs font-bold text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
-                              {booking.bookingReference || `BK-${1000 + idx}`}
-                            </span>
-                            <span
-                              className={`text-[11px] font-bold uppercase px-2 py-0.5 rounded ${
-                                (booking.status || "").toUpperCase() === "CONFIRMED"
-                                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                                  : "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                              }`}
-                            >
-                              {booking.status || "CONFIRMED"}
-                            </span>
-                          </div>
-                          <h4 className="font-bold text-white text-base">
-                            {booking.tripTitle || booking.destination || "Luxury Alpine Escape"}
-                          </h4>
-                          <p className="text-xs text-slate-400 flex items-center gap-2">
-                            <FiCalendar className="text-cyan-400" /> Date: {booking.travelDate ? String(booking.travelDate).split("T")[0] : "2026-10-15"}
-                            <span>•</span>
-                            <FiUser className="text-cyan-400" /> Travelers: {booking.travelersCount || 2}
-                          </p>
-                        </div>
+                    {bookings.slice(0, 2).map((booking, idx) => {
+                      const destTitle = getDestinationName(booking);
+                      const destLoc = getDestinationLocation(booking);
+                      const sDate = getStartDate(booking);
+                      const guests = getGuestsCount(booking);
+                      const bStatus = getStatus(booking);
+                      const total = getAmount(booking);
+                      const bRef = booking.bookingReference || booking.id || `BKG-${1000 + idx}`;
 
-                        <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                          <div className="text-right mr-2">
-                            <span className="text-[10px] text-slate-400 block">Total</span>
-                            <span className="text-base font-black text-white">${booking.totalAmount || 1850}</span>
+                      return (
+                        <div
+                          key={booking.id || booking.bookingReference || idx}
+                          className="rounded-2xl border border-white/10 bg-slate-800/60 p-4 hover:border-cyan-400/40 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                        >
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs font-bold text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+                                {bRef}
+                              </span>
+                              <span
+                                className={`text-[11px] font-bold uppercase px-2 py-0.5 rounded ${
+                                  bStatus === "CONFIRMED"
+                                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                                    : "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                                }`}
+                              >
+                                {bStatus}
+                              </span>
+                            </div>
+                            <h4 className="font-bold text-white text-base">{destTitle}</h4>
+                            <p className="text-xs text-slate-400 flex items-center gap-2">
+                              <FiMapPin className="text-cyan-400 shrink-0" /> {destLoc}
+                              <span>•</span>
+                              <FiCalendar className="text-cyan-400 shrink-0" /> {sDate}
+                              <span>•</span>
+                              <FiUser className="text-cyan-400 shrink-0" /> {guests} Guest(s)
+                            </p>
                           </div>
-                          <button
-                            onClick={() => setSelectedTicket(booking)}
-                            className="px-3.5 py-2 rounded-xl bg-cyan-400/20 text-cyan-300 border border-cyan-400/30 hover:bg-cyan-400 hover:text-slate-950 text-xs font-bold transition-all flex items-center gap-1.5"
-                          >
-                            <FaQrcode /> View Ticket
-                          </button>
+
+                          <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                            <div className="text-right mr-2">
+                              <span className="text-[10px] text-slate-400 block">Total</span>
+                              <span className="text-base font-black text-white">${total.toLocaleString()}</span>
+                            </div>
+                            <button
+                              onClick={() => setSelectedTicket(booking)}
+                              className="px-3.5 py-2 rounded-xl bg-cyan-400/20 text-cyan-300 border border-cyan-400/30 hover:bg-cyan-400 hover:text-slate-950 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <FaQrcode /> View Ticket
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -492,7 +597,11 @@ const UserProfileHub = () => {
                 <span className="text-xs font-bold uppercase tracking-wider text-cyan-400">Exclusive Traveler Perk</span>
                 <h3 className="text-xl sm:text-2xl font-black text-white">Unlock 15% Off Your Next International Expedition</h3>
                 <p className="text-slate-400 text-sm max-w-xl">
-                  Use coupon code <span className="font-mono font-bold text-cyan-300 bg-white/5 px-2 py-0.5 rounded border border-white/10">GHUREASHI2026</span> at checkout for curated seasonal flight & resort packages.
+                  Use coupon code{" "}
+                  <span className="font-mono font-bold text-cyan-300 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                    GHUREASHI2026
+                  </span>{" "}
+                  at checkout for curated seasonal flight & resort packages.
                 </p>
               </div>
               <Link
@@ -505,7 +614,9 @@ const UserProfileHub = () => {
           </div>
         )}
 
+        {/* ==================================================================== */}
         {/* TAB 2: PERSONAL & PASSPORT DETAILS */}
+        {/* ==================================================================== */}
         {activeTab === "profile" && (
           <form onSubmit={handleProfileSave} className="space-y-6 animate-fadeIn">
             {/* Primary Details */}
@@ -763,7 +874,7 @@ const UserProfileHub = () => {
               <button
                 type="submit"
                 disabled={savingProfile}
-                className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-black text-sm shadow-xl shadow-cyan-400/20 hover:opacity-95 transition-all flex items-center gap-2 disabled:opacity-50"
+                className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-black text-sm shadow-xl shadow-cyan-400/20 hover:opacity-95 transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
               >
                 <FiSave /> {savingProfile ? "Saving Details..." : "Save All Changes"}
               </button>
@@ -771,7 +882,9 @@ const UserProfileHub = () => {
           </form>
         )}
 
+        {/* ==================================================================== */}
         {/* TAB 3: MY BOOKINGS & TICKETS */}
+        {/* ==================================================================== */}
         {activeTab === "trips" && (
           <div className="space-y-6 animate-fadeIn">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -809,78 +922,97 @@ const UserProfileHub = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {bookings.map((booking, idx) => (
-                  <div
-                    key={booking.id || idx}
-                    className="rounded-3xl bg-slate-900/80 border border-white/10 hover:border-cyan-400/40 p-6 backdrop-blur-xl transition-all flex flex-col justify-between space-y-4"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-bold text-cyan-300 bg-cyan-400/10 px-2.5 py-1 rounded-lg border border-cyan-400/20">
-                            {booking.bookingReference || `BK-928${idx}`}
-                          </span>
-                          <span className="text-xs text-slate-500">
-                            Booked on {booking.createdAt ? String(booking.createdAt).split("T")[0] : "Recent"}
-                          </span>
-                        </div>
-                        <span
-                          className={`text-xs font-bold uppercase px-3 py-1 rounded-full ${
-                            (booking.status || "").toUpperCase() === "CONFIRMED"
-                              ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                              : "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                          }`}
-                        >
-                          {booking.status || "CONFIRMED"}
-                        </span>
-                      </div>
+                {bookings.map((booking, idx) => {
+                  const destTitle = getDestinationName(booking);
+                  const destLoc = getDestinationLocation(booking);
+                  const destImg = getDestinationImage(booking);
+                  const sDate = getStartDate(booking);
+                  const eDate = getEndDate(booking);
+                  const guests = getGuestsCount(booking);
+                  const bStatus = getStatus(booking);
+                  const total = getAmount(booking);
+                  const bRef = booking.bookingReference || booking.id || `BKG-928${idx}`;
 
-                      <h4 className="text-lg font-black text-white mt-4">
-                        {booking.tripTitle || booking.destination || "Scenic Mountain & Lake Explorer"}
-                      </h4>
-                      <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
-                        <FiMapPin className="text-cyan-400" /> {booking.destination || "International Location"}
-                      </p>
-
-                      <div className="grid grid-cols-2 gap-3 mt-4 bg-white/5 rounded-2xl p-3 text-xs">
-                        <div>
-                          <span className="text-slate-400 block">Departure</span>
-                          <span className="font-bold text-white">
-                            {booking.travelDate ? String(booking.travelDate).split("T")[0] : "2026-10-15"}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-slate-400 block">Travelers</span>
-                          <span className="font-bold text-white">{booking.travelersCount || 2} Person(s)</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                  return (
+                    <div
+                      key={booking.id || booking.bookingReference || idx}
+                      className="rounded-3xl bg-slate-900/80 border border-white/10 hover:border-cyan-400/40 p-6 backdrop-blur-xl transition-all flex flex-col justify-between space-y-4"
+                    >
                       <div>
-                        <span className="text-[10px] uppercase tracking-wider text-slate-400 block">Total Amount</span>
-                        <span className="text-xl font-black text-cyan-300">
-                          ${booking.totalAmount ? Number(booking.totalAmount).toLocaleString() : "1,850"}
-                        </span>
+                        <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-xs font-bold text-cyan-300 bg-cyan-400/10 px-2.5 py-1 rounded-lg border border-cyan-400/20">
+                              {bRef}
+                            </span>
+                            <span className="text-xs text-slate-500">
+                              {booking.createdAt ? `Booked on ${String(booking.createdAt).split("T")[0]}` : "Active Booking"}
+                            </span>
+                          </div>
+                          <span
+                            className={`text-xs font-bold uppercase px-3 py-1 rounded-full ${
+                              bStatus === "CONFIRMED"
+                                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                                : "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                            }`}
+                          >
+                            {bStatus}
+                          </span>
+                        </div>
+
+                        <div className="mt-4 flex items-start gap-4">
+                          <img
+                            src={destImg}
+                            alt={destTitle}
+                            className="w-16 h-16 rounded-2xl object-cover shrink-0 ring-1 ring-white/10"
+                          />
+                          <div>
+                            <h4 className="text-lg font-black text-white line-clamp-1">{destTitle}</h4>
+                            <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
+                              <FiMapPin className="text-cyan-400 shrink-0" /> {destLoc}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3 mt-4 bg-white/5 rounded-2xl p-3.5 text-xs">
+                          <div>
+                            <span className="text-slate-400 block text-[10px] uppercase font-bold">Departure & Return</span>
+                            <span className="font-bold text-white block mt-0.5">
+                              {sDate} → {eDate}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400 block text-[10px] uppercase font-bold">Party Size</span>
+                            <span className="font-bold text-white block mt-0.5">{guests} Person(s)</span>
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setSelectedTicket(booking)}
-                          className="px-4 py-2 rounded-xl bg-cyan-400 text-slate-950 font-bold text-xs hover:bg-white transition-all flex items-center gap-1.5 shadow-md shadow-cyan-400/20"
-                        >
-                          <FaQrcode /> View Voucher
-                        </button>
+                      <div className="flex items-center justify-between pt-3 border-t border-white/10">
+                        <div>
+                          <span className="text-[10px] uppercase tracking-wider text-slate-400 block font-bold">Total Amount</span>
+                          <span className="text-xl font-black text-cyan-300">${total.toLocaleString()}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setSelectedTicket(booking)}
+                            className="px-4 py-2.5 rounded-xl bg-cyan-400 text-slate-950 font-bold text-xs hover:bg-white transition-all flex items-center gap-1.5 shadow-md shadow-cyan-400/20 cursor-pointer"
+                          >
+                            <FaQrcode /> View Voucher
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
         )}
 
+        {/* ==================================================================== */}
         {/* TAB 4: SECURITY & PASSWORDS */}
+        {/* ==================================================================== */}
         {activeTab === "security" && (
           <div className="max-w-2xl space-y-6 animate-fadeIn">
             <div className="rounded-3xl bg-slate-900/80 border border-white/10 p-6 sm:p-8 backdrop-blur-xl space-y-6">
@@ -933,7 +1065,7 @@ const UserProfileHub = () => {
 
                 <button
                   type="submit"
-                  className="px-6 py-3 rounded-xl bg-cyan-400 text-slate-950 font-bold text-xs hover:bg-white transition-all"
+                  className="px-6 py-3 rounded-xl bg-cyan-400 text-slate-950 font-bold text-xs hover:bg-white transition-all cursor-pointer"
                 >
                   Update Password
                 </button>
@@ -947,7 +1079,7 @@ const UserProfileHub = () => {
               </div>
               <button
                 onClick={handleLogout}
-                className="px-5 py-2.5 rounded-xl bg-red-500 text-white font-bold text-xs hover:bg-red-600 transition-all shrink-0"
+                className="px-5 py-2.5 rounded-xl bg-red-500 text-white font-bold text-xs hover:bg-red-600 transition-all shrink-0 cursor-pointer"
               >
                 Sign Out Everywhere
               </button>
@@ -968,12 +1100,14 @@ const UserProfileHub = () => {
                 </div>
                 <div>
                   <h3 className="font-black text-white text-base">Traveler Boarding Voucher</h3>
-                  <p className="text-xs font-mono text-cyan-400">{selectedTicket.bookingReference || "BK-VALID-2026"}</p>
+                  <p className="text-xs font-mono text-cyan-400">
+                    {selectedTicket.bookingReference || selectedTicket.id || "BKG-VALID-2026"}
+                  </p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedTicket(null)}
-                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all"
+                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all cursor-pointer"
               >
                 <FiX className="text-lg" />
               </button>
@@ -985,33 +1119,32 @@ const UserProfileHub = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">Destination Trip</span>
-                    <h4 className="text-lg font-black text-white">
-                      {selectedTicket.tripTitle || selectedTicket.destination || "International Adventure"}
-                    </h4>
+                    <h4 className="text-lg font-black text-white">{getDestinationName(selectedTicket)}</h4>
+                    <p className="text-xs text-slate-400 mt-0.5">{getDestinationLocation(selectedTicket)}</p>
                   </div>
                   <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-[11px] border border-emerald-500/30">
-                    {selectedTicket.status || "CONFIRMED"}
+                    {getStatus(selectedTicket)}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 pt-2 text-xs">
+                <div className="grid grid-cols-2 gap-4 pt-2 text-xs border-t border-white/5">
                   <div>
                     <span className="text-slate-400 block">Lead Traveler</span>
                     <span className="font-bold text-white">{formData.fullname || user?.fullname || "Lead Passenger"}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block">Travel Date</span>
+                    <span className="text-slate-400 block">Travel Dates</span>
                     <span className="font-bold text-cyan-300">
-                      {selectedTicket.travelDate ? String(selectedTicket.travelDate).split("T")[0] : "2026-10-15"}
+                      {getStartDate(selectedTicket)} → {getEndDate(selectedTicket)}
                     </span>
                   </div>
                   <div>
                     <span className="text-slate-400 block">Travelers Count</span>
-                    <span className="font-bold text-white">{selectedTicket.travelersCount || 2} Person(s)</span>
+                    <span className="font-bold text-white">{getGuestsCount(selectedTicket)} Person(s)</span>
                   </div>
                   <div>
                     <span className="text-slate-400 block">Paid Amount</span>
-                    <span className="font-bold text-white">${selectedTicket.totalAmount || 1850}</span>
+                    <span className="font-bold text-emerald-400">${getAmount(selectedTicket).toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -1023,7 +1156,6 @@ const UserProfileHub = () => {
                   <span className="text-[11px] text-slate-400 block">Present at airport or hotel concierge desk</span>
                 </div>
                 <div className="p-2 bg-white rounded-xl shadow-lg">
-                  {/* Mock styled QR */}
                   <div className="w-16 h-16 grid grid-cols-4 grid-rows-4 gap-0.5 bg-slate-950 p-1 rounded">
                     <div className="bg-white col-span-2 row-span-2 rounded-xs" />
                     <div className="bg-white" />
@@ -1042,13 +1174,13 @@ const UserProfileHub = () => {
             <div className="p-4 bg-slate-950/80 border-t border-white/10 flex items-center justify-end gap-3">
               <button
                 onClick={() => window.print()}
-                className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-2 transition-all"
+                className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-2 transition-all cursor-pointer"
               >
                 <FiPrinter /> Print Voucher
               </button>
               <button
                 onClick={() => setSelectedTicket(null)}
-                className="px-5 py-2.5 rounded-xl bg-cyan-400 text-slate-950 font-bold text-xs hover:bg-white transition-all"
+                className="px-5 py-2.5 rounded-xl bg-cyan-400 text-slate-950 font-bold text-xs hover:bg-white transition-all cursor-pointer"
               >
                 Done
               </button>
