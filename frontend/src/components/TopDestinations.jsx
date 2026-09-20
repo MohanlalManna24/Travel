@@ -1,32 +1,40 @@
-import { FiArrowRight } from "react-icons/fi";
+import React from "react";
+import { FiArrowRight, FiCompass } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import DestinationCards from "./DestinationCards.jsx";
 
 const TopDestinations = () => {
   return (
-    <section className="bg-white px-6 py-20 sm:px-10 lg:px-12 lg:py-28">
-      <div className="mx-auto max-w-7xl">
-        <div className="relative mb-12 flex flex-col gap-5 sm:mb-14 sm:flex-row sm:items-end sm:justify-between">
-          <div className="relative z-10 max-w-2xl">
-            <p className="mb-3 text-xs font-bold uppercase tracking-[0.3em] text-cyan-600">
-              Explore the world
-            </p>
-            <h2 className="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
-              Top Destinations
+    <section className="relative overflow-hidden bg-slate-950 px-4 py-20 text-slate-100 sm:px-6 lg:px-8 lg:py-28">
+      {/* Background ambient lighting */}
+      <div className="pointer-events-none absolute -left-40 top-1/4 h-96 w-96 rounded-full bg-cyan-500/10 blur-[120px]" />
+      <div className="pointer-events-none absolute -right-40 bottom-10 h-96 w-96 rounded-full bg-blue-600/10 blur-[120px]" />
+
+      <div className="relative mx-auto max-w-7xl">
+        {/* Section Header */}
+        <div className="relative mb-12 flex flex-col gap-6 sm:mb-16 sm:flex-row sm:items-end sm:justify-between border-b border-white/10 pb-8">
+          <div className="relative z-10 max-w-2xl space-y-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-cyan-300">
+              <FiCompass className="text-sm" /> Handpicked Expeditions
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
+              Featured <span className="font-serif italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-indigo-300">World Escapes</span>
             </h2>
-            <p className="mt-4 max-w-xl text-base leading-7 text-slate-600">
-              Discover unforgettable places and plan your next adventure with
-              our handpicked travel experiences.
+            <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
+              Step into curated global sanctuaries, private alpine chalets, and historic Mediterranean coastlines crafted for the discerning traveler.
             </p>
           </div>
+
           <Link
             to="/destination"
-            className="group relative z-10 inline-flex items-center gap-2 text-sm font-bold text-cyan-700 transition hover:text-slate-900"
+            className="group inline-flex items-center gap-2.5 rounded-full border border-cyan-400/30 bg-slate-900/80 px-6 py-3 text-xs font-black uppercase tracking-wider text-cyan-300 shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-cyan-300 hover:bg-cyan-400 hover:text-slate-950 hover:shadow-cyan-400/20 shrink-0"
           >
-            View all destinations
+            Explore All 40+ Destinations
             <FiArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
           </Link>
         </div>
+
+        {/* Top 3 Cards Grid */}
         <DestinationCards limit={3} />
       </div>
     </section>
