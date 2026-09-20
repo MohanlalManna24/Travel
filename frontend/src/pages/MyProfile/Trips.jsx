@@ -14,7 +14,8 @@ const Trips = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/api/bookings", { withCredentials: true });
+        const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+        const res = await axios.get(`${API_URL}/api/bookings`, { withCredentials: true });
         const all = Array.isArray(res.data) ? res.data : res.data?.bookings || res.data?.data || [];
         const userEmail = (user?.email || "").toLowerCase().trim();
         const userId = user?.id;

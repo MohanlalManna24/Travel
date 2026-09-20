@@ -458,8 +458,8 @@ const DetailsDestination = () => {
 
       {/* INSTANT BOOKING MODAL */}
       {bookingModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-          <div className="relative w-full max-w-lg bg-slate-900 border border-cyan-500/30 rounded-3xl overflow-hidden shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
+          <div className="relative w-full max-w-lg bg-slate-900 border border-cyan-500/30 rounded-3xl overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto">
             {confirmedBooking ? (
               <div className="p-6 sm:p-8 space-y-6 text-center animate-fadeIn">
                 <div className="w-16 h-16 rounded-2xl bg-emerald-400 text-slate-950 grid place-items-center text-3xl font-black mx-auto shadow-lg shadow-emerald-400/20">

@@ -177,21 +177,21 @@ const MobileNavItem = ({ item, isActive }) => {
   const Icon = item.icon;
 
   return (
-    <li className="flex-1">
+    <li className="flex-1 min-w-[56px] shrink-0">
       <NavLink
         to={item.path}
-        className={`flex flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-medium transition-all duration-200 ${
+        className={`flex flex-col items-center justify-center gap-1 rounded-xl px-1.5 py-2 text-[10px] sm:text-[11px] font-medium transition-all duration-200 ${
           isActive
-            ? "bg-linear-to-b from-cyan-500/20 to-blue-500/10 font-semibold text-cyan-400 ring-1 ring-cyan-500/40"
+            ? "bg-linear-to-b from-cyan-500/20 to-blue-500/10 font-semibold text-cyan-400 ring-1 ring-cyan-500/40 shadow-xs"
             : "text-slate-400 hover:bg-slate-900 hover:text-slate-200"
         }`}
       >
         <Icon
-          className={`text-xl transition-transform duration-200 ${
+          className={`text-lg sm:text-xl transition-transform duration-200 ${
             isActive ? "scale-110 text-cyan-400" : ""
           }`}
         />
-        <span className="scale-90 tracking-tight">
+        <span className="tracking-tight whitespace-nowrap">
           {item.shortLabel || item.name}
         </span>
       </NavLink>
@@ -343,8 +343,8 @@ const Sidebar = () => {
       {/* =========================================================================
           MOBILE RESPONSIVE BOTTOM NAVIGATION DOCK
           ========================================================================= */}
-      <nav className="fixed inset-x-3 bottom-3 z-50 rounded-2xl border border-slate-800/90 bg-slate-950/90 p-2 shadow-2xl backdrop-blur-xl lg:hidden">
-        <ul className="flex items-center justify-between gap-1">
+      <nav className="fixed inset-x-2 sm:inset-x-4 bottom-2 sm:bottom-3 z-50 rounded-2xl border border-slate-800/90 bg-slate-950/95 p-1.5 sm:p-2 shadow-2xl backdrop-blur-xl lg:hidden">
+        <ul className="flex items-center justify-between gap-1 overflow-x-auto no-scrollbar scroll-smooth">
           {allNavItems.map((item) => (
             <MobileNavItem
               key={item.id}
@@ -354,15 +354,15 @@ const Sidebar = () => {
           ))}
 
           {/* Quick Exit to Home on Mobile */}
-          <li className="flex-1">
+          <li className="flex-1 min-w-[56px] shrink-0">
             <button
               type="button"
               onClick={handleSignOut}
-              className="flex w-full flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-medium text-rose-400 transition-all duration-200 hover:bg-rose-950/30 cursor-pointer"
+              className="flex w-full flex-col items-center justify-center gap-1 rounded-xl px-1.5 py-2 text-[10px] sm:text-[11px] font-medium text-rose-400 transition-all duration-200 hover:bg-rose-950/30 cursor-pointer"
               title="Sign Out Session"
             >
-              <HiOutlineArrowLeftOnRectangle className="text-xl" />
-              <span className="scale-90">Logout</span>
+              <HiOutlineArrowLeftOnRectangle className="text-lg sm:text-xl" />
+              <span className="tracking-tight whitespace-nowrap">Logout</span>
             </button>
           </li>
         </ul>

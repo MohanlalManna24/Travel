@@ -20,13 +20,13 @@ import {
  * 1. Search Bar Component with Keyboard Shortcut Badge
  */
 export const HeaderSearch = ({
-  placeholder = "Search trips, bookings, users...",
+  placeholder = "Search trips, bookings...",
   value,
   onChange,
   onSearch,
 }) => {
   return (
-    <div className="relative w-44 sm:w-64 lg:w-80">
+    <div className="relative w-28 xs:w-40 sm:w-64 lg:w-80">
       <HiOutlineMagnifyingGlass className="absolute top-1/2 left-3.5 -translate-y-1/2 text-base text-slate-400" />
       <input
         type="search"
