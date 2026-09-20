@@ -16,12 +16,15 @@ import {
 import { Link, useSearchParams } from "react-router-dom";
 import DestinationCards from "../components/DestinationCards";
 import Layout from "../components/layout/Layout";
+import useDebounce from "../hooks/useDebounce";
 
 function Destination() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialSearch = searchParams.get("search") || "";
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [categoryFilter, setCategoryFilter] = useState("All");
+
+  const debouncedSearch = useDebounce(searchQuery, 250);
 
   const categories = [
     { id: "All", label: "All Destinations" },
@@ -143,7 +146,7 @@ function Destination() {
       <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <DestinationCards
           detailsBasePath="/destination"
-          searchQuery={searchQuery}
+          searchQuery={debouncedSearch}
           categoryFilter={categoryFilter}
         />
       </section>

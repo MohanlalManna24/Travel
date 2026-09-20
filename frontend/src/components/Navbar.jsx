@@ -18,15 +18,25 @@ const Navbar = () => {
     checkAuth();
   }, [checkAuth]);
 
-  // Close profile dropdown when clicking outside
+  // Close profile dropdown when clicking outside or pressing Escape
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setProfileDropdownOpen(false);
       }
     };
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setProfileDropdownOpen(false);
+        setIsMenuOpen(false);
+      }
+    };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -58,10 +68,10 @@ const Navbar = () => {
       <Layout>
         <div className="flex items-center justify-between">
           {/* LOGO */}
-          <NavLink to="/" className="group flex items-center gap-2.5">
+          <NavLink to="/" className="group flex items-center gap-2.5" aria-label="GhureAshi Home">
             <img
               src={logo}
-              alt="GhureAshi logo"
+              alt="GhureAshi Logo"
               className="h-9 w-9 object-contain transition-transform duration-300 group-hover:rotate-6"
             />
             <span className="text-xl font-black tracking-tight text-white">
@@ -93,12 +103,15 @@ const Navbar = () => {
               <div className="relative" ref={dropdownRef}>
                 <button
                   type="button"
+                  aria-haspopup="true"
+                  aria-expanded={profileDropdownOpen}
+                  aria-label="Toggle user profile menu"
                   onClick={() => setProfileDropdownOpen((prev) => !prev)}
-                  className="flex items-center gap-2.5 rounded-full border border-cyan-400/40 bg-slate-900/80 py-1.5 pl-1.5 pr-3.5 text-sm font-semibold text-white shadow-lg transition-all hover:border-cyan-300 hover:bg-slate-800 focus:outline-none"
+                  className="flex items-center gap-2.5 rounded-full border border-cyan-400/40 bg-slate-900/80 py-1.5 pl-1.5 pr-3.5 text-sm font-semibold text-white shadow-lg transition-all hover:border-cyan-300 hover:bg-slate-800 focus:outline-none cursor-pointer"
                 >
                   <img
                     src={userAvatar}
-                    alt={user.fullname || "User"}
+                    alt={user.fullname || "User Avatar"}
                     className="h-8 w-8 rounded-full object-cover ring-2 ring-cyan-400/60"
                   />
                   <span className="max-w-[120px] truncate text-xs font-bold text-slate-200">

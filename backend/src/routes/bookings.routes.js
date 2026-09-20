@@ -10,6 +10,7 @@ import {
   bookingsValidation,
   bookingsUpdateValidation,
 } from "../middleware/bookingsValidation.js";
+import { submissionLimiter } from "../middleware/rateLimiter.js";
 
 const router = express.Router();
 
@@ -17,8 +18,8 @@ const router = express.Router();
  * @route POST /api/bookings/create or POST /api/bookings
  * @desc Create a new booking
  */
-router.post("/create", bookingsValidation, createNewBooking);
-router.post("/", bookingsValidation, createNewBooking);
+router.post("/create", submissionLimiter, bookingsValidation, createNewBooking);
+router.post("/", submissionLimiter, bookingsValidation, createNewBooking);
 
 /**
  * @route GET /api/bookings

@@ -157,9 +157,10 @@ const DestinationCards = ({
               <div className="relative aspect-[16/11] overflow-hidden bg-slate-950">
                 <img
                   src={dest.image}
-                  alt={dest.name}
+                  alt={`Scenic view of ${dest.name} in ${dest.location}`}
                   className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                   loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
 
@@ -173,9 +174,10 @@ const DestinationCards = ({
                 {/* Wishlist Heart Button */}
                 <button
                   type="button"
-                  aria-label="Save to wishlist"
+                  aria-label={isWishlisted ? `Remove ${dest.name} from wishlist` : `Save ${dest.name} to wishlist`}
+                  aria-pressed={isWishlisted}
                   onClick={() => toggleWishlist(dest.id)}
-                  className={`absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border backdrop-blur-md shadow-lg transition-all transform hover:scale-110 ${
+                  className={`absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border backdrop-blur-md shadow-lg transition-all transform hover:scale-110 cursor-pointer ${
                     isWishlisted
                       ? "bg-rose-500 border-rose-400 text-white"
                       : "bg-slate-950/70 border-white/20 text-white hover:border-rose-400 hover:text-rose-400"

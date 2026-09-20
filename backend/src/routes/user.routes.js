@@ -19,6 +19,7 @@ import {
   userUpdateValidation,
 } from "../middleware/userValidation.js";
 import { authenticateUser } from "../middleware/auth.middleware.js";
+import { authLimiter } from "../middleware/rateLimiter.js";
 
 const router = express.Router();
 
@@ -30,15 +31,15 @@ const router = express.Router();
  * @desc    Register a new user account & set cookies
  * @route   POST /api/users/register or /api/users/signup
  */
-router.post("/register", registerValidation, registerUser);
-router.post("/signup", registerValidation, registerUser);
+router.post("/register", authLimiter, registerValidation, registerUser);
+router.post("/signup", authLimiter, registerValidation, registerUser);
 
 /*
  * @desc    Sign in user & set HTTP-only Access & Refresh cookies
  * @route   POST /api/users/login or /api/users/signin
  */
-router.post("/login", loginValidation, loginUser);
-router.post("/signin", loginValidation, loginUser);
+router.post("/login", authLimiter, loginValidation, loginUser);
+router.post("/signin", authLimiter, loginValidation, loginUser);
 
 /*
  * @desc    Refresh expired Access Token via Refresh Token Cookie

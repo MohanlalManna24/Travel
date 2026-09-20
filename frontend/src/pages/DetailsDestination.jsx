@@ -137,6 +137,17 @@ const DetailsDestination = () => {
       .finally(() => setIsLoading(false));
   }, [destinationId]);
 
+  // Close booking modal on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && bookingModalOpen) {
+        setBookingModalOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [bookingModalOpen]);
+
   const pricePerPerson = Number(destination?.pricePerHead || 0);
   const totalCalculated = pricePerPerson * travelerCount;
 

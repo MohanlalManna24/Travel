@@ -15,12 +15,13 @@ import {
   updateNotificationValidation,
   replyNotificationValidation,
 } from "../middleware/notificationsValidation.js";
+import { submissionLimiter } from "../middleware/rateLimiter.js";
 
 const router = express.Router();
 
 // Bulk operations & global endpoints
 router.get("/", fetchAllNotifications);
-router.post("/", createNotificationValidation, createNewNotification);
+router.post("/", submissionLimiter, createNotificationValidation, createNewNotification);
 router.patch("/mark-all-read", markAllAsRead);
 router.post("/bulk-actions", handleBulkActions);
 

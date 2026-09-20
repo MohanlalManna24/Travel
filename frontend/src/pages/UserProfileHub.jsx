@@ -95,6 +95,17 @@ const UserProfileHub = () => {
     setActiveTab(tabFromUrl);
   }, [searchParams]);
 
+  // Dismiss ticket modal on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && selectedTicket) {
+        setSelectedTicket(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedTicket]);
+
   // Form State
   const [formData, setFormData] = useState({
     fullname: "",
