@@ -21,6 +21,7 @@ import {
   HiOutlineInformationCircle,
 } from "react-icons/hi2";
 import { PiAirplaneTiltBold } from "react-icons/pi";
+import { AdminToast } from "../components/AdminToast";
 
 const TripManagement = () => {
   // ---------------------------------------------------------------------------
@@ -400,24 +401,7 @@ const TripManagement = () => {
   return (
     <div className="min-h-screen space-y-6 p-4 sm:p-6 lg:p-8">
       {/* Toast Notification Alert */}
-      {toast && (
-        <div
-          className={`fixed top-20 right-6 z-50 flex items-center gap-2.5 rounded-2xl border px-4 py-3 text-sm font-semibold shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-200 ${
-            toast.type === "error"
-              ? "border-rose-500/30 bg-rose-950/90 text-rose-200"
-              : toast.type === "info"
-              ? "border-cyan-500/30 bg-slate-900/90 text-cyan-200"
-              : "border-emerald-500/30 bg-emerald-950/90 text-emerald-200"
-          }`}
-        >
-          {toast.type === "error" ? (
-            <HiOutlineInformationCircle className="text-lg text-rose-400" />
-          ) : (
-            <HiOutlineCheck className="text-lg text-emerald-400" />
-          )}
-          <span>{toast.message}</span>
-        </div>
-      )}
+      <AdminToast toast={toast} onClose={() => setToast(null)} />
 
       {/* Top Banner / Breadcrumb & Primary Actions */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
