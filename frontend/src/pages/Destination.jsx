@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   FiArrowRight,
   FiCompass,
@@ -5,121 +6,124 @@ import {
   FiMapPin,
   FiSearch,
   FiSun,
+  FiSliders,
 } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import DestinationCards from "../components/DestinationCards";
 import Layout from "../components/layout/Layout";
 
 function Destination() {
-  return (
-    <main className="overflow-hidden bg-[#f7fbfa]">
-      <section className="relative isolate bg-[#073b4c] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(6,214,160,0.35),transparent_28%),radial-gradient(circle_at_88%_10%,rgba(255,209,102,0.25),transparent_24%)]" />
-        <div className="absolute -bottom-24 -right-16 h-64 w-64 rounded-full border-28 border-[#ef476f]/30 sm:h-96 sm:w-96" />
-        <Layout>
-          <div className="relative grid min-h-135 items-center gap-10 px-6 py-16 sm:px-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-12 lg:py-20">
-            <div className="max-w-xl">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-[#ffd166] backdrop-blur-sm">
-                <FiCompass /> Curated escapes
-              </div>
-              <h1 className="max-w-lg text-5xl font-black leading-[0.98] tracking-tight sm:text-6xl lg:text-7xl">
-                Go somewhere that feels like <span className="text-[#06d6a0]">you.</span>
-              </h1>
-              <p className="mt-6 max-w-lg text-base leading-7 text-cyan-50/75 sm:text-lg">
-                From sunlit coastlines to electric city nights, discover places
-                with the right rhythm for your next unforgettable story.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a
-                  href="#destinations"
-                  className="group inline-flex items-center gap-2 rounded-full bg-[#ffd166] px-5 py-3 text-sm font-extrabold text-[#073b4c] transition hover:-translate-y-1 hover:bg-white"
-                >
-                  Explore places
-                  <FiArrowRight className="transition-transform group-hover:translate-x-1" />
-                </a>
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center gap-2 rounded-full border border-white/30 px-5 py-3 text-sm font-bold text-white transition hover:border-[#06d6a0] hover:bg-[#06d6a0] hover:text-[#073b4c]"
-                >
-                  Plan with an expert
-                </Link>
-              </div>
-            </div>
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialSearch = searchParams.get("search") || "";
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
+  const [categoryFilter, setCategoryFilter] = useState("All");
 
-            <div className="relative mx-auto w-full max-w-md lg:justify-self-end">
-              <div className="absolute -left-5 top-12 z-10 flex items-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-bold text-[#073b4c] shadow-xl sm:-left-10">
-                <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#ef476f]/15 text-[#ef476f]"><FiHeart /></span>
-                Loved by 2,000+ travelers
-              </div>
-              <div className="relative aspect-4/5 overflow-hidden rounded-4xl border-8 border-white/15 bg-[#118ab2] shadow-2xl shadow-black/25">
-                <img src="https://img.magnific.com/premium-photo/create-image-symbolizing-world-travel-landmarks-family_980716-3433.jpg?w=1500" alt="A colorful travel scene" className="h-full w-full object-cover" loading="lazy" />
-                <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-[#073b4c]/90 to-transparent p-6 pt-24">
-                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#ffd166]">The world is wide</p>
-                  <p className="mt-2 text-2xl font-black">Your next chapter starts here.</p>
-                </div>
-              </div>
-              <div className="absolute -bottom-5 -right-5 grid h-20 w-20 place-items-center rounded-full bg-[#06d6a0] text-center text-xs font-black uppercase leading-4 text-[#073b4c] shadow-xl sm:-right-8">
-                Pack<br />light
-              </div>
+  const categories = [
+    { id: "All", label: "All Escapes" },
+    { id: "Beach", label: "Tropical & Islands" },
+    { id: "Mountains", label: "Alps & Summits" },
+    { id: "City", label: "Iconic Capitals" },
+    { id: "Culture", label: "Heritage & Culture" },
+  ];
+
+  const handleSearchChange = (e) => {
+    const val = e.target.value;
+    setSearchQuery(val);
+    if (val.trim()) {
+      setSearchParams({ search: val.trim() });
+    } else {
+      setSearchParams({});
+    }
+  };
+
+  return (
+    <main className="min-h-screen bg-slate-950 text-slate-100 overflow-hidden pb-20">
+      {/* Background ambient glow */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-10 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 right-10 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl" />
+      </div>
+
+      {/* HERO SECTION */}
+      <section className="relative z-10 pt-16 pb-12">
+        <Layout>
+          <div className="max-w-4xl mx-auto text-center space-y-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-cyan-300">
+              <FiCompass /> Curated International Expeditions
             </div>
+            <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white leading-tight">
+              Go somewhere that feels like{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-indigo-300">
+                magic.
+              </span>
+            </h1>
+            <p className="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto">
+              From sun-drenched Mediterranean coastlines to high-altitude Alpine chalets, discover handpicked travel packages designed for life-changing moments.
+            </p>
           </div>
         </Layout>
       </section>
 
-      <section className="relative z-10 mx-auto -mt-8 max-w-7xl px-6 sm:px-10 lg:px-12">
-        <div className="grid overflow-hidden rounded-2xl bg-white shadow-xl shadow-[#073b4c]/10 sm:grid-cols-3">
-          {[
-            ["24/7", "Travel support", FiHeart],
-            ["40+", "Handpicked places", FiMapPin],
-            ["98%", "Happy explorers", FiSun],
-          ].map(([value, label, Icon]) => (
-            <div key={label} className="flex items-center gap-4 border-b border-slate-100 px-6 py-5 last:border-0 sm:border-b-0 sm:border-r sm:last:border-0 sm:px-8">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#06d6a0]/15 text-xl text-[#069c78]"><Icon /></span>
-              <div><p className="text-2xl font-black text-[#073b4c]">{value}</p><p className="text-sm text-slate-500">{label}</p></div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section id="destinations" className="px-6 py-20 sm:px-10 lg:px-12 lg:py-28">
-        <Layout>
-          <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="mb-3 text-xs font-black uppercase tracking-[0.28em] text-[#ef476f]">Find your kind of wonderful</p>
-              <h2 className="text-4xl font-black tracking-tight text-[#073b4c] sm:text-5xl">Where will you feel most alive?</h2>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">Browse our favorite escapes, selected for the moments you will talk about long after you return home.</p>
-            </div>
-            <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-400 shadow-sm">
-              <FiSearch className="text-[#118ab2]" />
-              <span>Popular destinations</span>
-            </div>
+      {/* SEARCH AND CATEGORY FILTER SECTION */}
+      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-8">
+        <div className="rounded-3xl border border-white/10 bg-slate-900/80 p-5 sm:p-6 backdrop-blur-2xl shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+          {/* Search Input */}
+          <div className="relative w-full md:max-w-md">
+            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400 text-lg" />
+            <input
+              type="text"
+              placeholder="Search destination, city, or country..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="w-full h-12 rounded-2xl bg-white/5 border border-white/10 pl-11 pr-4 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 outline-none transition"
+            />
           </div>
 
-          <div className="mb-10 flex flex-wrap gap-3">
-            {["All escapes", "Beach days", "City energy", "Slow travel"].map((filter, index) => (
-              <button key={filter} type="button" className={`rounded-full px-5 py-2.5 text-sm font-bold transition ${index === 0 ? "bg-[#073b4c] text-white shadow-lg shadow-[#073b4c]/15" : "border border-slate-200 bg-white text-slate-600 hover:border-[#06d6a0] hover:text-[#069c78]"}`}>
-                {filter}
+          {/* Category Filter Pills */}
+          <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto no-scrollbar pb-1 md:pb-0">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setCategoryFilter(cat.id)}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                  categoryFilter === cat.id
+                    ? "bg-cyan-400 text-slate-950 font-black shadow-lg shadow-cyan-400/20"
+                    : "bg-white/5 border border-white/10 text-slate-300 hover:border-white/20 hover:text-white"
+                }`}
+              >
+                {cat.label}
               </button>
             ))}
           </div>
-
-          <DestinationCards requireAuthForDetails={true} />
-        </Layout>
+        </div>
       </section>
 
-      <section className="bg-[#ffd166] px-6 py-16 sm:px-10 lg:px-12">
-        <Layout>
-          <div className="flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-center">
-            <div className="max-w-2xl">
-              <p className="text-xs font-black uppercase tracking-[0.25em] text-[#ef476f]">Make it personal</p>
-              <h2 className="mt-3 text-3xl font-black leading-tight text-[#073b4c] sm:text-4xl">Not sure where to begin?</h2>
-              <p className="mt-3 text-base leading-7 text-[#073b4c]/70">Tell us what you love, and we will match you with a journey that fits your pace.</p>
-            </div>
-            <Link to="/contact" className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-[#ef476f] px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-[#ef476f]/20 transition hover:-translate-y-1 hover:bg-[#073b4c]">
-              Build my trip <FiArrowRight className="transition-transform group-hover:translate-x-1" />
-            </Link>
+      {/* DESTINATION CARDS GRID */}
+      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <DestinationCards
+          detailsBasePath="/destination"
+          searchQuery={searchQuery}
+          categoryFilter={categoryFilter}
+        />
+      </section>
+
+      {/* BOTTOM CTA BANNER */}
+      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
+        <div className="rounded-3xl bg-gradient-to-r from-cyan-950/60 via-slate-900 to-blue-950/60 border border-cyan-500/30 p-8 sm:p-10 backdrop-blur-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 text-center md:text-left">
+            <span className="text-xs font-bold uppercase tracking-wider text-cyan-400">Custom Itineraries</span>
+            <h3 className="text-2xl sm:text-3xl font-black text-white">Can&apos;t find your exact dream trip?</h3>
+            <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
+              Our travel artisans build personalized bespoke journeys tailored to your timeline, group size, and budget.
+            </p>
           </div>
-        </Layout>
+          <Link
+            to="/contact"
+            className="shrink-0 px-6 py-3.5 rounded-2xl bg-cyan-400 text-slate-950 font-black text-sm shadow-xl shadow-cyan-400/20 hover:bg-white transition-all flex items-center gap-2"
+          >
+            Request Custom Trip <FiArrowRight />
+          </Link>
+        </div>
       </section>
     </main>
   );

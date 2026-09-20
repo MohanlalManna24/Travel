@@ -30,6 +30,7 @@ import {
   HiOutlineCalendarDays,
 } from "react-icons/hi2";
 import { PiTicketBold, PiAirplaneTiltBold } from "react-icons/pi";
+import { AdminToast } from "../components/AdminToast";
 
 const PaymentAndRevenue = () => {
   // ---------------------------------------------------------------------------
@@ -86,9 +87,14 @@ const PaymentAndRevenue = () => {
 
       let fetched = [];
       try {
-        const res = await axios.get(BOOKINGS_URL, { timeout: 3500 });
+        const res = await axios.get(BOOKINGS_URL, { 
+          timeout: 4000, 
+          withCredentials: true 
+        });
         fetched = Array.isArray(res.data?.data)
           ? res.data.data
+          : Array.isArray(res.data?.bookings)
+          ? res.data.bookings
           : Array.isArray(res.data)
           ? res.data
           : [];
@@ -404,6 +410,9 @@ const PaymentAndRevenue = () => {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl mx-auto text-slate-800">
+      {/* Toast Alert */}
+      <AdminToast toast={toast} onClose={() => setToast(null)} />
+
       {/* ----------------------------------------------------------------------- */}
       {/* 1. TOP HEADER & TELEMETRY CONTROLS */}
       {/* ----------------------------------------------------------------------- */}

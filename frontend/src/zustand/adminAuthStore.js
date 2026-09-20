@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-const BACKEND_URL = "http://localhost:4000";
+const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
 export const useAdminAuthStore = create((set, get) => ({
   admin: null,

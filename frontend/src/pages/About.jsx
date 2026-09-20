@@ -1,3 +1,4 @@
+import React from "react";
 import {
   FiArrowRight,
   FiCompass,
@@ -5,6 +6,8 @@ import {
   FiHeart,
   FiStar,
   FiUsers,
+  FiAward,
+  FiShield,
 } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import Layout from "../components/layout/Layout";
@@ -13,132 +16,146 @@ import img from "../assets/images/3d-travel-with-airplane.jpg";
 const values = [
   {
     icon: FiCompass,
-    title: "Curiosity first",
-    text: "We look beyond the obvious so every itinerary has a little more soul.",
-    color: "bg-[#06d6a0]/15 text-[#069c78]",
+    title: "Curiosity First",
+    text: "We explore beyond conventional tourist routes so every itinerary delivers authentic cultural soul.",
+    color: "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20",
   },
   {
     icon: FiHeart,
-    title: "People over plans",
-    text: "Thoughtful guidance and real support make the journey feel effortless.",
-    color: "bg-[#ef476f]/15 text-[#db315c]",
+    title: "Dedicated Human Touch",
+    text: "24/7 personal concierge support and thoughtful guidance from trip planning to return.",
+    color: "bg-rose-500/10 text-rose-400 border border-rose-500/20",
   },
   {
     icon: FiGlobe,
-    title: "Travel with purpose",
-    text: "We champion local experiences that leave places and people better.",
-    color: "bg-[#ffd166]/30 text-[#b77a00]",
+    title: "Sustainable & Conscious",
+    text: "We champion boutique eco-resorts and local guides that leave places and communities thriving.",
+    color: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
   },
 ];
 
 const About = () => {
   return (
-    <main className="overflow-hidden bg-[#f7fbfa]">
-      <section className="relative isolate bg-[#073b4c] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(239,71,111,0.32),transparent_28%),radial-gradient(circle_at_10%_80%,rgba(6,214,160,0.28),transparent_30%)]" />
-        <div className="absolute -left-20 top-10 h-40 w-40 rounded-full border-18 border-[#ffd166]/30" />
+    <main className="min-h-screen bg-slate-950 text-slate-100 overflow-hidden pb-20">
+      {/* Background ambient glow */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-10 left-1/3 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 right-10 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl" />
+      </div>
+
+      {/* HERO SECTION */}
+      <section className="relative z-10 pt-16 pb-12">
         <Layout>
-          <div className="relative grid min-h-127.5 items-center gap-12 px-6 py-16 sm:px-10 lg:grid-cols-[1fr_0.9fr] lg:px-12 lg:py-20">
-            <div className="max-w-2xl">
-              <p className="mb-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.28em] text-[#ffd166]">
-                <span className="h-2 w-2 rounded-full bg-[#ef476f]" /> The people behind Travel.
-              </p>
-              <h1 className="text-5xl font-black leading-[0.98] tracking-tight sm:text-6xl lg:text-7xl">
-                We make the world feel a little <span className="text-[#06d6a0]">closer.</span>
+          <div className="grid min-h-[480px] items-center gap-12 lg:grid-cols-12">
+            <div className="lg:col-span-7 space-y-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-cyan-300">
+                <FiAward /> The Story Behind Ghure Ashi
+              </div>
+              <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white leading-tight">
+                We make the world feel a little{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-indigo-300">
+                  closer.
+                </span>
               </h1>
-              <p className="mt-7 max-w-xl text-base leading-7 text-cyan-50/75 sm:text-lg">
-                Ghure Ashi began with a simple belief: planning a trip should feel
-                as exciting as taking one. Today, we help curious people find
-                meaningful places, memorable stays, and more reasons to wander.
+              <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-xl">
+                Ghure Ashi began with a simple vision: planning an international journey should feel just as inspiring and effortless as arriving. Today, we craft world-class luxury experiences for curious travelers globally.
               </p>
-              <Link
-                to="/destination"
-                className="group mt-8 inline-flex items-center gap-2 rounded-full bg-[#ffd166] px-5 py-3 text-sm font-extrabold text-[#073b4c] transition hover:-translate-y-1 hover:bg-white"
-              >
-                Meet your next adventure
-                <FiArrowRight className="transition-transform group-hover:translate-x-1" />
-              </Link>
+              <div className="pt-2 flex flex-wrap gap-3">
+                <Link
+                  to="/destination"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-3.5 text-sm font-black text-slate-950 shadow-xl shadow-cyan-400/20 hover:opacity-95 transition-all"
+                >
+                  Explore Destinations <FiArrowRight />
+                </Link>
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-bold text-white hover:bg-white/10 transition-all"
+                >
+                  Speak With Concierge
+                </Link>
+              </div>
             </div>
 
-            <div className="relative mx-auto w-full max-w-md lg:justify-self-end">
-              <div className="absolute -right-4 top-8 z-10 rounded-2xl bg-[#ef476f] px-5 py-4 shadow-xl shadow-[#073b4c]/30 sm:-right-10">
-                <p className="text-3xl font-black">8 yrs</p>
-                <p className="text-xs font-bold uppercase tracking-widest text-white/75">of wander</p>
+            <div className="lg:col-span-5 relative">
+              <div className="relative aspect-square overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-2xl">
+                <img src={img} alt="Travel visualization" className="h-full w-full object-cover opacity-80" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
               </div>
-              <div className="aspect-square overflow-hidden rounded-4xl border-8 border-white/15 bg-[#118ab2] shadow-2xl shadow-black/25">
-                <img src={img} alt="A colorful travel landscape" className="h-full w-full object-cover" />
+
+              {/* Floating Stat Badge 1 */}
+              <div className="absolute -top-4 -right-4 rounded-2xl border border-cyan-400/40 bg-slate-900/90 p-4 backdrop-blur-xl shadow-xl flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-cyan-400 text-slate-950 font-black">
+                  <FiAward className="text-xl" />
+                </div>
+                <div>
+                  <p className="text-xl font-black text-white">8+ Years</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Excellence</p>
+                </div>
               </div>
-              <div className="absolute -bottom-6 -left-5 flex items-center gap-3 rounded-2xl bg-white px-4 py-3 text-[#073b4c] shadow-xl sm:-left-10">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#06d6a0]/15 text-xl text-[#069c78]"><FiStar /></span>
-                <div><p className="text-sm font-black">4.9 / 5</p><p className="text-xs text-slate-500">traveler rating</p></div>
+
+              {/* Floating Stat Badge 2 */}
+              <div className="absolute -bottom-4 -left-4 rounded-2xl border border-white/10 bg-slate-900/90 p-4 backdrop-blur-xl shadow-xl flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-amber-400 text-slate-950 font-black">
+                  <FiStar className="text-xl fill-slate-950" />
+                </div>
+                <div>
+                  <p className="text-xl font-black text-white">4.9 / 5.0</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">12,000+ Reviews</p>
+                </div>
               </div>
             </div>
           </div>
         </Layout>
       </section>
 
-      <section className="px-6 py-20 sm:px-10 lg:px-12 lg:py-28">
-        <Layout>
-          <div className="grid items-center gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
-            <div>
-              <p className="mb-3 text-xs font-black uppercase tracking-[0.28em] text-[#ef476f]">Our north star</p>
-              <h2 className="text-4xl font-black leading-tight tracking-tight text-[#073b4c] sm:text-5xl">Good trips start with good intent.</h2>
-              <div className="mt-6 h-1.5 w-20 rounded-full bg-[#06d6a0]" />
-            </div>
-            <div className="space-y-5 text-base leading-8 text-slate-600">
-              <p>We are a small, curious team of destination nerds, thoughtful planners, and lifelong explorers. We know the joy of finding a quiet cafe on a busy street and the relief of having someone helpful when plans change.</p>
-              <p>That is the feeling we build into every recommendation. No copy-paste holidays, no rushed checklists. Just honest inspiration and the practical details that help you travel with confidence.</p>
-            </div>
-          </div>
+      {/* CORE VALUES */}
+      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center max-w-2xl mx-auto space-y-3 mb-12">
+          <span className="text-xs font-bold uppercase tracking-widest text-cyan-400">Our Core Philosophy</span>
+          <h2 className="text-3xl sm:text-4xl font-black text-white">
+            Exceptional journeys start with mindful intentions.
+          </h2>
+        </div>
 
-          <div className="mt-16 grid gap-4 md:grid-cols-3">
-            {values.map(({ icon: Icon, title, text, color }) => (
-              <article key={title} className="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-[#073b4c]/10">
-                <div className={`mb-6 grid h-14 w-14 place-items-center rounded-2xl text-2xl ${color}`}><Icon /></div>
-                <h3 className="text-xl font-black text-[#073b4c]">{title}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-600">{text}</p>
-              </article>
-            ))}
-          </div>
-        </Layout>
+        <div className="grid gap-6 md:grid-cols-3">
+          {values.map(({ icon: Icon, title, text, color }) => (
+            <article
+              key={title}
+              className="rounded-3xl border border-white/10 bg-slate-900/80 p-8 backdrop-blur-xl shadow-xl space-y-4 hover:border-cyan-400/40 transition-all duration-300 hover:-translate-y-1"
+            >
+              <div className={`grid h-14 w-14 place-items-center rounded-2xl ${color}`}>
+                <Icon className="text-2xl" />
+              </div>
+              <h3 className="text-xl font-black text-white">{title}</h3>
+              <p className="text-xs sm:text-sm leading-relaxed text-slate-300">{text}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
-      <section className="bg-[#ffd166] px-6 py-16 sm:px-10 lg:px-12">
-        <Layout>
-          <div className="grid items-center gap-10 lg:grid-cols-[1fr_auto]">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.28em] text-[#ef476f]">A growing community</p>
-              <h2 className="mt-3 max-w-2xl text-3xl font-black leading-tight text-[#073b4c] sm:text-4xl">More than a booking. A better way to go.</h2>
-            </div>
-            <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
-              {[
-                ["40+", "destinations"],
-                ["12k", "happy travelers"],
-                ["24/7", "human support"],
-              ].map(([value, label]) => (
-                <div key={label} className="text-center"><p className="text-3xl font-black text-[#073b4c]">{value}</p><p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#073b4c]/60">{label}</p></div>
-              ))}
-            </div>
+      {/* GLOBAL STATS STRIP */}
+      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="rounded-3xl border border-white/10 bg-slate-900/90 p-8 sm:p-10 backdrop-blur-2xl shadow-2xl grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+          <div>
+            <p className="text-3xl sm:text-4xl font-black text-cyan-300">40+</p>
+            <p className="text-xs text-slate-400 uppercase tracking-wider mt-1 font-bold">World Destinations</p>
           </div>
-        </Layout>
-      </section>
-
-      <section className="bg-[#073b4c] px-6 py-20 text-white sm:px-10 lg:px-12">
-        <Layout>
-          <div className="flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-center">
-            <div className="max-w-xl">
-              <div className="mb-4 flex items-center gap-2 text-[#06d6a0]"><FiUsers /><span className="text-xs font-black uppercase tracking-[0.25em]">Travel your way</span></div>
-              <h2 className="text-3xl font-black sm:text-4xl">Ready to find your place in the world?</h2>
-              <p className="mt-3 leading-7 text-cyan-50/70">Start with a destination, a feeling, or simply a free weekend.</p>
-            </div>
-            <Link to="/contact" className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-[#06d6a0] px-6 py-3.5 text-sm font-extrabold text-[#073b4c] transition hover:-translate-y-1 hover:bg-white">
-              Talk to our team <FiArrowRight className="transition-transform group-hover:translate-x-1" />
-            </Link>
+          <div>
+            <p className="text-3xl sm:text-4xl font-black text-emerald-400">12,500+</p>
+            <p className="text-xs text-slate-400 uppercase tracking-wider mt-1 font-bold">Delighted Travelers</p>
           </div>
-        </Layout>
+          <div>
+            <p className="text-3xl sm:text-4xl font-black text-amber-300">99.4%</p>
+            <p className="text-xs text-slate-400 uppercase tracking-wider mt-1 font-bold">Satisfaction Rate</p>
+          </div>
+          <div>
+            <p className="text-3xl sm:text-4xl font-black text-blue-400">24/7</p>
+            <p className="text-xs text-slate-400 uppercase tracking-wider mt-1 font-bold">VIP Global Support</p>
+          </div>
+        </div>
       </section>
     </main>
-  )
-}
+  );
+};
 
-export default About
+export default About;

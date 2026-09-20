@@ -289,9 +289,12 @@ export const bulkDeleteNotifications = async (ids = []) => {
   if (!Array.isArray(ids) || ids.length === 0) return 0;
   await ensureNotificationsTable();
 
+  const numericIds = ids.filter((id) => !isNaN(Number(id))).map(Number);
+  const codeIds = ids.map(String);
+
   const [result] = await pool.query(
     "DELETE FROM notifications WHERE id IN (?) OR notification_code IN (?)",
-    [ids, ids]
+    [numericIds.length > 0 ? numericIds : [-1], codeIds.length > 0 ? codeIds : ["__none__"]]
   );
   return result.affectedRows;
 };
@@ -300,9 +303,12 @@ export const bulkMarkNotificationsRead = async (ids = [], isRead = true) => {
   if (!Array.isArray(ids) || ids.length === 0) return 0;
   await ensureNotificationsTable();
 
+  const numericIds = ids.filter((id) => !isNaN(Number(id))).map(Number);
+  const codeIds = ids.map(String);
+
   const [result] = await pool.query(
     "UPDATE notifications SET is_read = ? WHERE id IN (?) OR notification_code IN (?)",
-    [isRead ? 1 : 0, ids, ids]
+    [isRead ? 1 : 0, numericIds.length > 0 ? numericIds : [-1], codeIds.length > 0 ? codeIds : ["__none__"]]
   );
   return result.affectedRows;
 };

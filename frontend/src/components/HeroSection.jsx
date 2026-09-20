@@ -1,9 +1,22 @@
-import { FiArrowRight, FiMapPin, FiPlay, FiSearch } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { FiArrowRight, FiMapPin, FiPlay, FiSearch, FiCompass } from "react-icons/fi";
+import { Link, useNavigate } from "react-router-dom";
 import Layout from "./layout/Layout";
 import heroImg from "../assets/images/heroImg.png";
 
 function HeroSection() {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/destination?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate("/destination");
+    }
+  };
+
   return (
     <section
       className="relative -mt-19 min-h-screen overflow-hidden bg-slate-950 pt-19 text-white"
@@ -13,64 +26,79 @@ function HeroSection() {
         backgroundSize: "cover",
       }}
     >
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,12,27,0.9)_0%,rgba(2,12,27,0.58)_46%,rgba(2,12,27,0.16)_100%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(2,12,27,0.78)_0%,transparent_35%,rgba(2,12,27,0.2)_100%)]" />
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/70 to-slate-950/30" />
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/40" />
 
       <Layout>
-        <div className="relative flex min-h-[calc(100vh-76px)] items-center px-6 py-16 sm:px-10 lg:px-12">
+        <div className="relative flex min-h-[calc(100vh-76px)] items-center px-4 py-16 sm:px-8 lg:px-12">
           <div className="max-w-3xl pt-8 lg:pt-0">
-            <div className="mb-7 inline-flex animate-pulse items-center gap-2 rounded-full border border-cyan-200/30 bg-cyan-100/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-cyan-100 backdrop-blur-md">
-              <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_14px_#67e8f9]" />
-              Your next story starts here
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-cyan-300 backdrop-blur-md shadow-lg shadow-cyan-400/10">
+              <span className="h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
+              World Class Travel Experiences
             </div>
 
-            <h1 className="max-w-2xl text-5xl font-black leading-[0.98] tracking-tight sm:text-7xl lg:text-8xl">
+            <h1 className="max-w-2xl text-5xl font-black leading-[1.02] tracking-tight sm:text-7xl lg:text-8xl">
               Every Trip
               <br />
-              <span className="font-serif font-bold italic tracking-wide text-cyan-300">
-                tells 
+              <span className="font-serif italic font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-indigo-300">
+                Tells A Story
               </span>
-              <span> a story</span>
             </h1>
-            <p className="mt-7 max-w-xl text-base leading-7 text-slate-200 sm:text-lg">
-              Find the places that make you feel most alive. Curated journeys,
-              local secrets, and unforgettable moments, all in one place.
+            
+            <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
+              Discover breathtaking destinations, curated private expeditions, and world-class retreats crafted for the modern wanderer.
             </p>
 
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-8 flex flex-col gap-3.5 sm:flex-row">
               <Link
                 to="/destination"
-                className="group inline-flex items-center justify-center gap-3 rounded-full bg-cyan-300 px-6 py-3.5 font-bold text-slate-950 shadow-[0_12px_35px_rgba(103,232,249,0.25)] transition duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-[0_18px_45px_rgba(255,255,255,0.2)]"
+                className="group inline-flex items-center justify-center gap-3 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-7 py-4 font-black text-slate-950 shadow-xl shadow-cyan-400/25 transition-all duration-300 hover:opacity-95 hover:scale-[1.02]"
               >
-                Explore destinations
+                Explore Destinations
                 <FiArrowRight className="transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
-              <button className="group inline-flex items-center justify-center gap-3 rounded-full border border-white/35 bg-white/10 px-6 py-3.5 font-bold text-white backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-white hover:bg-white/20">
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-white text-slate-900 transition-transform duration-300 group-hover:scale-110">
-                  <FiPlay className="ml-0.5 text-xs" />
-                </span>
-                See the inspiration
-              </button>
+              <Link
+                to="/about"
+                className="group inline-flex items-center justify-center gap-3 rounded-full border border-white/20 bg-white/10 px-7 py-4 font-bold text-white backdrop-blur-md transition-all duration-300 hover:bg-white/20 hover:border-white/40"
+              >
+                <FiCompass className="text-cyan-300 text-lg group-hover:rotate-45 transition-transform" />
+                Why Ghure Ashi
+              </Link>
             </div>
 
-            <div className="mt-12 flex max-w-xl flex-col gap-3 rounded-2xl border border-white/20 bg-slate-950/35 p-3 backdrop-blur-xl sm:flex-row sm:items-center">
-              <div className="flex flex-1 items-center gap-3 px-3 py-2">
-                <FiMapPin className="shrink-0 text-xl text-cyan-300" />
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Where to?</p>
-                  <p className="text-sm font-semibold text-white">Search a destination</p>
+            {/* Interactive Destination Search Bar */}
+            <form
+              onSubmit={handleSearchSubmit}
+              className="mt-10 flex max-w-xl flex-col gap-2 rounded-2xl border border-white/15 bg-slate-900/80 p-2.5 backdrop-blur-2xl shadow-2xl sm:flex-row sm:items-center"
+            >
+              <div className="flex flex-1 items-center gap-3 px-3 py-1.5">
+                <FiMapPin className="shrink-0 text-xl text-cyan-400" />
+                <div className="w-full">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block">
+                    Where would you like to go?
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Switzerland, Bali, Paris, Maldives..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-transparent text-sm font-semibold text-white placeholder:text-slate-500 outline-none"
+                  />
                 </div>
               </div>
-              <button className="group flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 font-bold text-slate-950 transition duration-300 hover:bg-cyan-300 sm:w-auto">
+              <button
+                type="submit"
+                className="group flex items-center justify-center gap-2 rounded-xl bg-cyan-400 px-6 py-3 font-black text-slate-950 transition-all duration-300 hover:bg-white sm:w-auto shadow-md"
+              >
                 <FiSearch className="transition-transform duration-300 group-hover:scale-110" />
-                Find a trip
+                Find Trips
               </button>
-            </div>
+            </form>
           </div>
 
-          <div className="absolute bottom-8 right-8 hidden items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-white/70 lg:flex">
-            <span className="h-px w-12 bg-white/50" />
-            Scroll to wander
+          <div className="absolute bottom-8 right-8 hidden items-center gap-3 text-xs font-bold uppercase tracking-widest text-slate-400 lg:flex">
+            <span className="h-px w-12 bg-cyan-400/50" />
+            Scroll to discover
           </div>
         </div>
       </Layout>

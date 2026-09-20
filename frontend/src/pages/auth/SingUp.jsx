@@ -1,22 +1,20 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { FcGoogle } from "react-icons/fc";
-import { FaFacebook } from "react-icons/fa6";
-import { FaLock } from "react-icons/fa";
+import { FaFacebook, FaLock, FaEye, FaEyeSlash } from "react-icons/fa6";
 import { IoMdPerson, IoIosArrowRoundForward } from "react-icons/io";
 import { IoMail } from "react-icons/io5";
 import { MdOutlinePhoneAndroid } from "react-icons/md";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { HiOutlineExclamationCircle, HiOutlineArrowPath } from "react-icons/hi2";
 import travelIllustration from "../../assets/images/img1.jpg";
 import { Link, useNavigate } from "react-router-dom";
+import useAuthStore from "../../zustand/authStore";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { register, isLoading, error: storeError, clearError } = useAuthStore();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [localError, setErrorMessage] = useState("");
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -31,7 +29,8 @@ const SignUp = () => {
       ...prevData,
       [name]: value,
     }));
-    if (errorMessage) setErrorMessage("");
+    if (localError) setErrorMessage("");
+    if (storeError) clearError();
   };
 
   const handleSubmit = async (e) => {
@@ -41,110 +40,86 @@ const SignUp = () => {
       return;
     }
 
-    setLoading(true);
     setErrorMessage("");
 
-    try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
-      const response = await axios.post(
-        `${API_URL}/api/users/register`,
-        {
-          fullname: formData.fullName.trim(),
-          email: formData.email.trim(),
-          phone: formData.phone.trim(),
-          password: formData.password,
-        },
-        {
-          withCredentials: true, // Stores HTTP-only Access & Refresh cookies
-        }
-      );
+    const result = await register({
+      fullname: formData.fullName.trim(),
+      email: formData.email.trim(),
+      phone: formData.phone.trim(),
+      password: formData.password,
+    });
 
-      if (response.data?.user) {
-        // Save local client state
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        localStorage.setItem("accessToken", response.data.accessToken || "");
-        localStorage.setItem("isLoggedIn", "true");
-
-        // Redirect to profile overview
-        navigate("/profile/overview", { replace: true });
-      } else {
-        throw new Error("Invalid response received from server");
-      }
-    } catch (err) {
-      console.error("Registration failed:", err);
-      const serverError =
-        err.response?.data?.error ||
-        err.response?.data?.message ||
-        "Registration failed. Please verify your details.";
-      setErrorMessage(serverError);
-    } finally {
-      setLoading(false);
+    if (result.success) {
+      navigate("/", { replace: true });
+    } else {
+      setErrorMessage(result.message || "Registration failed. Please try again.");
     }
   };
 
+  const displayError = localError || storeError;
+
   return (
-    <main className="min-h-[calc(100vh-5rem)] bg-[#f5f3ed] px-4 py-8 sm:px-6 lg:px-10">
-      <div className="mx-auto grid max-w-6xl overflow-hidden rounded-4xl bg-white shadow-[0_24px_80px_rgba(24,50,52,0.12)] lg:grid-cols-[0.9fr_1.1fr]">
+    <main className="min-h-[calc(100vh-5rem)] bg-slate-950 px-4 py-8 sm:px-6 lg:px-10 flex items-center justify-center">
+      <div className="w-full max-w-5xl overflow-hidden rounded-3xl bg-slate-900 border border-white/10 shadow-2xl lg:grid lg:grid-cols-2">
         {/* Left Hero */}
-        <div className="relative hidden min-h-170 overflow-hidden bg-[#cde7e3] lg:block">
+        <div className="relative hidden min-h-[560px] overflow-hidden lg:block">
           <img
-            className="absolute inset-0 h-full w-full object-cover mix-blend-multiply opacity-80"
+            className="absolute inset-0 h-full w-full object-cover opacity-60"
             src={travelIllustration}
-            alt="Illustration of famous travel destinations"
+            alt="Travel background"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#123c3e]/90 via-[#123c3e]/10 to-transparent" />
-          <div className="absolute left-10 right-10 top-10 flex items-center justify-between text-sm font-semibold tracking-[0.18em] text-white uppercase">
-            <span>Travel.</span>
-            <span className="rounded-full border border-white/50 px-4 py-2 text-xs tracking-[0.12em]">
-              Est. 2026
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+          <div className="absolute left-8 right-8 top-8 flex items-center justify-between text-xs font-bold tracking-widest text-cyan-300 uppercase">
+            <span>GHURE ASHI</span>
+            <span className="rounded-full border border-white/30 bg-white/5 px-3 py-1 text-[10px]">
+              MEMBERSHIP
             </span>
           </div>
-          <div className="absolute bottom-10 left-10 right-10 text-white">
-            <p className="mb-4 text-xs font-bold tracking-[0.3em] text-[#f4c46a] uppercase">
-              The world is waiting
+          <div className="absolute bottom-8 left-8 right-8 text-white">
+            <p className="mb-2 text-xs font-black tracking-widest text-cyan-400 uppercase">
+              Join The Club
             </p>
-            <h2 className="max-w-sm text-4xl font-bold leading-tight">
-              Make room for a little more wonder.
+            <h2 className="text-3xl font-black leading-tight">
+              Unlock exclusive luxury trips and traveler perks.
             </h2>
-            <p className="mt-4 max-w-sm text-sm leading-6 text-white/80">
-              Join a community of curious travelers and keep every unforgettable
-              place close.
+            <p className="mt-2 text-xs text-slate-300">
+              Create your account in 30 seconds and start exploring the world.
             </p>
           </div>
         </div>
 
         {/* Right Form */}
-        <section className="px-6 py-5 sm:px-12 sm:py-14 lg:px-16 lg:py-10">
-          <div className="mb-8">
-            <p className="mb-3 text-xs font-bold tracking-[0.28em] text-[#db8a3c] uppercase">
+        <section className="px-6 py-8 sm:px-10 sm:py-10 flex flex-col justify-center">
+          <div className="mb-5">
+            <p className="mb-1 text-xs font-bold tracking-widest text-cyan-400 uppercase">
               Start your journey
             </p>
-            <h1 className="text-4xl font-bold tracking-tight text-[#183b3d] sm:text-5xl">
-              Join Ghure Ashi.
+            <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl">
+              Create an Account
             </h1>
-            <p className="mt-3 text-sm leading-6 text-[#687878]">
-              Create your account and unlock bespoke itineraries & rewards.
+            <p className="mt-1 text-xs text-slate-400">
+              Join thousands of travelers enjoying personalized vacation packages.
             </p>
           </div>
 
           {/* Error Banner */}
-          {errorMessage && (
-            <div className="mb-6 rounded-2xl bg-rose-50 border border-rose-200/80 p-4 text-xs text-rose-800 flex items-start gap-3 animate-in fade-in duration-200">
-              <HiOutlineExclamationCircle className="text-lg text-rose-600 flex-shrink-0 mt-0.5" />
+          {displayError && (
+            <div className="mb-5 rounded-2xl bg-red-950/60 border border-red-500/40 p-4 text-xs text-red-300 flex items-start gap-3 animate-fadeIn">
+              <HiOutlineExclamationCircle className="text-lg text-red-400 shrink-0 mt-0.5" />
               <div>
                 <span className="font-bold">Registration Notice: </span>
-                <span>{errorMessage}</span>
+                <span>{displayError}</span>
               </div>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <label className="block text-sm font-semibold text-[#284b4c]">
-              Full name
-              <span className="relative mt-2 block">
-                <IoMdPerson className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg text-[#8aa3a0]" />
+          <form onSubmit={handleSubmit} className="space-y-3.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-300">
+              Full Name
+              <span className="relative mt-1.5 block">
+                <IoMdPerson className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-base text-slate-400" />
                 <input
-                  className="h-12 w-full rounded-xl border border-[#d8e2df] bg-[#fbfcfa] pl-12 pr-4 text-sm text-[#183b3d] outline-none transition placeholder:text-[#a7b5b3] focus:border-[#2f7773] focus:ring-4 focus:ring-[#2f7773]/10"
+                  className="h-11 w-full rounded-xl border border-white/10 bg-white/5 pl-11 pr-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
                   type="text"
                   placeholder="e.g. Aarav Sharma"
                   value={formData.fullName}
@@ -156,12 +131,12 @@ const SignUp = () => {
               </span>
             </label>
 
-            <label className="block text-sm font-semibold text-[#284b4c]">
-              Email address
-              <span className="relative mt-2 block">
-                <IoMail className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg text-[#8aa3a0]" />
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-300">
+              Email Address
+              <span className="relative mt-1.5 block">
+                <IoMail className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-base text-slate-400" />
                 <input
-                  className="h-12 w-full rounded-xl border border-[#d8e2df] bg-[#fbfcfa] pl-12 pr-4 text-sm text-[#183b3d] outline-none transition placeholder:text-[#a7b5b3] focus:border-[#2f7773] focus:ring-4 focus:ring-[#2f7773]/10"
+                  className="h-11 w-full rounded-xl border border-white/10 bg-white/5 pl-11 pr-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
                   type="email"
                   placeholder="you@example.com"
                   value={formData.email}
@@ -172,14 +147,14 @@ const SignUp = () => {
               </span>
             </label>
 
-            <label className="block text-sm font-semibold text-[#284b4c]">
-              Phone number
-              <span className="relative mt-2 block">
-                <MdOutlinePhoneAndroid className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg text-[#8aa3a0]" />
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-300">
+              Phone Number
+              <span className="relative mt-1.5 block">
+                <MdOutlinePhoneAndroid className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-base text-slate-400" />
                 <input
-                  className="h-12 w-full rounded-xl border border-[#d8e2df] bg-[#fbfcfa] pl-12 pr-4 text-sm text-[#183b3d] outline-none transition placeholder:text-[#a7b5b3] focus:border-[#2f7773] focus:ring-4 focus:ring-[#2f7773]/10"
+                  className="h-11 w-full rounded-xl border border-white/10 bg-white/5 pl-11 pr-4 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
                   type="tel"
-                  placeholder="+91 98234 11223"
+                  placeholder="+91 9876543210"
                   value={formData.phone}
                   name="phone"
                   onChange={handleInputChange}
@@ -188,12 +163,12 @@ const SignUp = () => {
               </span>
             </label>
 
-            <label className="block text-sm font-semibold text-[#284b4c]">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-300">
               Password
-              <span className="relative mt-2 flex items-center">
-                <FaLock className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#8aa3a0]" />
+              <span className="relative mt-1.5 flex items-center">
+                <FaLock className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-xs text-slate-400" />
                 <input
-                  className="h-12 w-full rounded-xl border border-[#d8e2df] bg-[#fbfcfa] pl-12 pr-12 text-sm text-[#183b3d] outline-none transition placeholder:text-[#a7b5b3] focus:border-[#2f7773] focus:ring-4 focus:ring-[#2f7773]/10"
+                  className="h-11 w-full rounded-xl border border-white/10 bg-white/5 pl-11 pr-11 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
                   type={showPassword ? "text" : "password"}
                   placeholder="At least 6 characters"
                   value={formData.password}
@@ -204,7 +179,7 @@ const SignUp = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 text-lg text-slate-400 hover:text-slate-600"
+                  className="absolute right-4 text-slate-400 hover:text-white"
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
@@ -212,11 +187,11 @@ const SignUp = () => {
             </label>
 
             <button
-              disabled={loading}
-              className="group flex h-13 w-full items-center justify-center gap-2 rounded-xl cursor-pointer bg-[#e3a348] text-sm font-bold text-[#183b3d] shadow-[0_10px_24px_rgba(227,163,72,0.24)] transition hover:bg-[#efb45b] disabled:opacity-50 mt-2"
+              disabled={isLoading}
+              className="group flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-sm font-black text-slate-950 shadow-lg shadow-cyan-400/20 transition hover:opacity-95 disabled:opacity-50 mt-2"
               type="submit"
             >
-              {loading ? (
+              {isLoading ? (
                 <>
                   <HiOutlineArrowPath className="animate-spin text-lg" />
                   <span>Creating Account...</span>
@@ -230,35 +205,32 @@ const SignUp = () => {
             </button>
           </form>
 
-          <div className="my-6 flex items-center gap-4 text-xs font-medium text-[#91a09e]">
-            <span className="h-px flex-1 bg-[#e5ebe8]" />
-            <span>OR REGISTER WITH</span>
-            <span className="h-px flex-1 bg-[#e5ebe8]" />
+          <div className="my-5 flex items-center gap-4 text-[10px] font-bold tracking-wider text-slate-500 uppercase">
+            <span className="h-px flex-1 bg-white/10" />
+            <span>Or Connect With</span>
+            <span className="h-px flex-1 bg-white/10" />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <button
-              className="flex h-12 items-center justify-center gap-3 rounded-xl border border-[#d8e2df] text-sm font-semibold text-[#284b4c] transition hover:border-[#2f7773] hover:bg-[#f4f9f7] cursor-pointer"
+              className="flex h-11 items-center justify-center gap-2.5 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-slate-200 transition hover:bg-white/10 hover:border-cyan-400"
               type="button"
-              onClick={() => alert("Google OAuth login will be available with live cloud client ID.")}
+              onClick={() => alert("Google OAuth is enabled for verified cloud domains.")}
             >
-              <FcGoogle className="text-xl" /> Google
+              <FcGoogle className="text-lg" /> Google
             </button>
             <button
-              className="flex h-12 items-center justify-center gap-3 rounded-xl border border-[#d8e2df] text-sm font-semibold text-[#284b4c] transition hover:border-[#2f7773] hover:bg-[#f4f9f7] cursor-pointer"
+              className="flex h-11 items-center justify-center gap-2.5 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-slate-200 transition hover:bg-white/10 hover:border-cyan-400"
               type="button"
-              onClick={() => alert("Facebook OAuth login will be available with live client ID.")}
+              onClick={() => alert("Facebook SSO is enabled for verified domains.")}
             >
-              <FaFacebook className="text-xl text-[#1877f2]" /> Facebook
+              <FaFacebook className="text-lg text-blue-500" /> Facebook
             </button>
           </div>
 
-          <p className="mt-6 text-center text-sm text-[#687878]">
+          <p className="mt-5 text-center text-xs text-slate-400">
             Already have an account?{" "}
-            <Link
-              to="/auth/signin"
-              className="font-bold text-[#2f7773] hover:underline cursor-pointer"
-            >
+            <Link to="/auth/signin" className="font-bold text-cyan-400 hover:underline">
               Sign in
             </Link>
           </p>

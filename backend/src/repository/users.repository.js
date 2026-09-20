@@ -79,11 +79,17 @@ export const createUser = async (user) => {
   await ensureRefreshTokenColumn();
   const { fullname, email, phone, password, status = "active" } = user;
   const hashedPassword = password ? await bcrypt.hash(password, 10) : "";
+  
+  const rawDigits = phone ? String(phone).replace(/\D/g, "") : "";
+  const finalPhone = rawDigits && rawDigits.length >= 7 
+    ? rawDigits 
+    : `91${Math.floor(1000000000 + Math.random() * 9000000000)}`;
+
   const [result] = await pool.query(
     "INSERT INTO users (fullname, email, phone, password, status) VALUES (?, ?, ?, ?, ?)",
-    [fullname, email, phone, hashedPassword, (status || "active").toLowerCase()],
+    [fullname, email, finalPhone, hashedPassword, (status || "active").toLowerCase()],
   );
-  return { id: result.insertId, fullname, email, phone, status: status || "active" };
+  return { id: result.insertId, fullname, email, phone: finalPhone, status: status || "active" };
 };
 
 // 8. Check if user already exists
@@ -113,7 +119,15 @@ export const updateUserById = async (id, user) => {
 
   const updatedFullname = fullname !== undefined ? fullname : existingUser.fullname;
   const updatedEmail = email !== undefined ? email : existingUser.email;
-  const updatedPhone = phone !== undefined ? phone : existingUser.phone;
+  
+  let updatedPhone = existingUser.phone;
+  if (phone !== undefined) {
+    const rawDigits = String(phone).replace(/\D/g, "");
+    if (rawDigits && rawDigits.length >= 7) {
+      updatedPhone = rawDigits;
+    }
+  }
+
   const updatedStatus = status !== undefined ? status.toLowerCase() : existingUser.status;
 
   if (password && password.trim().length >= 6) {
@@ -139,6 +153,16 @@ export const deleteUserById = async (id) => {
   } catch (err) {
     // Ignore if table/rows don't exist
   }
+  try {
+    await pool.query("UPDATE bookings SET user_id = NULL WHERE user_id = ?", [id]);
+  } catch (err) {
+    // Ignore
+  }
+  try {
+    await pool.query("UPDATE notifications SET user_id = NULL WHERE user_id = ?", [id]);
+  } catch (err) {
+    // Ignore
+  }
 
   const [result] = await pool.query(
     "DELETE FROM users WHERE id = ?",
@@ -151,6 +175,16 @@ export const deleteUserById = async (id) => {
 export const deleteAllUsers = async () => {
   try {
     await pool.query("DELETE FROM users_full_details");
+  } catch (err) {
+    // Ignore
+  }
+  try {
+    await pool.query("UPDATE bookings SET user_id = NULL");
+  } catch (err) {
+    // Ignore
+  }
+  try {
+    await pool.query("UPDATE notifications SET user_id = NULL");
   } catch (err) {
     // Ignore
   }

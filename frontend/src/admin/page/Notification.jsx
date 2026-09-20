@@ -30,6 +30,7 @@ import {
   HiOutlineInformationCircle,
 } from "react-icons/hi2";
 import { PiAirplaneTiltBold, PiTicketBold } from "react-icons/pi";
+import { AdminToast } from "../components/AdminToast";
 
 const Notification = () => {
   // ---------------------------------------------------------------------------
@@ -540,6 +541,9 @@ const Notification = () => {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto text-slate-800">
+      {/* Toast Alert */}
+      <AdminToast toast={toastMessage} onClose={() => setToastMessage(null)} />
+
       {/* ----------------------------------------------------------------------- */}
       {/* 1. TOP HEADER & TELEMETRY CONTROLS */}
       {/* ----------------------------------------------------------------------- */}

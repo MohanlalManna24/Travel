@@ -62,6 +62,10 @@ const Dashboard = () => {
   };
 
   // ---------------------------------------------------------------------------
+  // API Endpoint
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+
+  // ---------------------------------------------------------------------------
   // DATA FETCHING & SYNCHRONIZATION
   // ---------------------------------------------------------------------------
   const fetchDashboardData = async (isManualRefresh = false) => {
@@ -72,9 +76,14 @@ const Dashboard = () => {
       // 1. Fetch Bookings
       let fetchedBookings = [];
       try {
-        const bookRes = await axios.get("http://localhost:4000/api/bookings", { timeout: 3500 });
+        const bookRes = await axios.get(`${API_BASE_URL}/api/bookings`, { 
+          timeout: 4000, 
+          withCredentials: true 
+        });
         fetchedBookings = Array.isArray(bookRes.data?.data)
           ? bookRes.data.data
+          : Array.isArray(bookRes.data?.bookings)
+          ? bookRes.data.bookings
           : Array.isArray(bookRes.data)
           ? bookRes.data
           : [];
@@ -90,9 +99,14 @@ const Dashboard = () => {
       // 2. Fetch Destinations / Trips
       let fetchedDestinations = [];
       try {
-        const destRes = await axios.get("http://localhost:4000/api/destinations", { timeout: 3500 });
+        const destRes = await axios.get(`${API_BASE_URL}/api/destinations`, { 
+          timeout: 4000, 
+          withCredentials: true 
+        });
         fetchedDestinations = Array.isArray(destRes.data?.data)
           ? destRes.data.data
+          : Array.isArray(destRes.data?.destinations)
+          ? destRes.data.destinations
           : Array.isArray(destRes.data)
           ? destRes.data
           : [];
@@ -108,16 +122,32 @@ const Dashboard = () => {
       // 3. Fetch Users
       let fetchedUsers = [];
       try {
-        const userRes = await axios.get("http://localhost:4000/api/user-details", { timeout: 3500 });
-        fetchedUsers = Array.isArray(userRes.data?.data)
+        const userRes = await axios.get(`${API_BASE_URL}/api/user-details`, { 
+          timeout: 4000, 
+          withCredentials: true 
+        });
+        fetchedUsers = Array.isArray(userRes.data?.userFullDetails)
+          ? userRes.data.userFullDetails
+          : Array.isArray(userRes.data?.users)
+          ? userRes.data.users
+          : Array.isArray(userRes.data?.data)
           ? userRes.data.data
           : Array.isArray(userRes.data)
           ? userRes.data
           : [];
       } catch {
         try {
-          const uRes = await axios.get("http://localhost:4000/api/users", { timeout: 2500 });
-          fetchedUsers = Array.isArray(uRes.data?.data) ? uRes.data.data : [];
+          const uRes = await axios.get(`${API_BASE_URL}/api/users`, { 
+            timeout: 3000, 
+            withCredentials: true 
+          });
+          fetchedUsers = Array.isArray(uRes.data?.users)
+            ? uRes.data.users
+            : Array.isArray(uRes.data?.data)
+            ? uRes.data.data
+            : Array.isArray(uRes.data)
+            ? uRes.data
+            : [];
         } catch {
           fetchedUsers = [];
         }
@@ -234,11 +264,11 @@ const Dashboard = () => {
     let cancelledBookings = 0;
 
     bookings.forEach((b) => {
-      const price = Number(b.totalPrice || b.amount || b.price) || 0;
+      const price = Number(b.totalAmount ?? b.totalPrice ?? b.amount ?? b.price ?? 0);
       totalRevenue += price;
 
       const pStatus = (b.paymentStatus || "").toLowerCase();
-      const bStatus = (b.status || "").toLowerCase();
+      const bStatus = (b.bookingStatus || b.status || "").toLowerCase();
 
       if (pStatus === "paid" || pStatus === "completed") {
         paidRevenue += price;

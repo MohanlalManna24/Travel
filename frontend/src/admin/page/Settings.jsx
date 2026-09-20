@@ -17,6 +17,7 @@ import {
   HiOutlineArrowDownTray,
   HiOutlineXMark,
 } from "react-icons/hi2";
+import { AdminToast } from "../components/AdminToast";
 
 const Settings = () => {
   // Active Tab: "general" | "payments" | "notifications" | "security" | "system"
@@ -142,6 +143,9 @@ const Settings = () => {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl mx-auto text-slate-800">
+      {/* Toast Alert */}
+      <AdminToast toast={toast} onClose={() => setToast(null)} />
+
       {/* ----------------------------------------------------------------------- */}
       {/* 1. TOP HEADER */}
       {/* ----------------------------------------------------------------------- */}

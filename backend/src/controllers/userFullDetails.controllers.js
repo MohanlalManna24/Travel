@@ -4,6 +4,7 @@ import {
   getUserFullDetailsByUserId,
   getAllUserFullDetails as getUserFullDetails,
   updateUserFullDetails as updateUserDetails,
+  deleteUserFullDetailsByUserId,
   checkUserFullDetailsExists,
 } from "../repository/userFullDetails.repository.js";
 import { validationResult } from "express-validator";
