@@ -99,75 +99,8 @@ const PaymentAndRevenue = () => {
           ? res.data
           : [];
       } catch (apiErr) {
-        console.warn("Backend API unavailable, loading fallback real transaction records:", apiErr.message);
-        const fallbackRes = await axios.get("/bookingsData.json");
-        fetched = Array.isArray(fallbackRes.data) ? fallbackRes.data : [];
-      }
-
-      // Generate structured transaction records if dataset is small
-      if (fetched.length === 0) {
-        fetched = [
-          {
-            id: "BKG-98401",
-            bookingReference: "BKG-98401",
-            customer: { name: "Aarav Sharma", email: "aarav.sharma@gmail.com", phone: "+91 98234 11223" },
-            destination: { name: "Paris Grand Escape", location: "Paris, France" },
-            startDate: "2026-10-15",
-            totalAmount: 185000,
-            paymentStatus: "Paid",
-            paymentMethod: "Credit Card",
-            transactionId: "TXN-STRIPE-890214",
-            createdAt: "2026-09-18T10:30:00Z",
-          },
-          {
-            id: "BKG-98402",
-            bookingReference: "BKG-98402",
-            customer: { name: "Sophia Vance", email: "sophia.vance@wanderer.io", phone: "+44 7911 123456" },
-            destination: { name: "Dubai Royal Safari", location: "Dubai, UAE" },
-            startDate: "2026-10-22",
-            totalAmount: 245000,
-            paymentStatus: "Paid",
-            paymentMethod: "Razorpay UPI",
-            transactionId: "TXN-RZP-994102",
-            createdAt: "2026-09-17T14:20:00Z",
-          },
-          {
-            id: "BKG-98403",
-            bookingReference: "BKG-98403",
-            customer: { name: "Rohan Verma", email: "rohan.v@techcorp.in", phone: "+91 98300 44556" },
-            destination: { name: "Bali Tropical Sanctuary", location: "Ubud, Bali" },
-            startDate: "2026-11-05",
-            totalAmount: 95000,
-            paymentStatus: "Pending",
-            paymentMethod: "Bank Transfer",
-            transactionId: "TXN-NEFT-Pending",
-            createdAt: "2026-09-16T09:15:00Z",
-          },
-          {
-            id: "BKG-98404",
-            bookingReference: "BKG-98404",
-            customer: { name: "Elena Rostova", email: "elena.rostova@travelglobe.com", phone: "+33 6 12 34 56 78" },
-            destination: { name: "Swiss Alpine Wonderland", location: "Interlaken, Switzerland" },
-            startDate: "2026-11-12",
-            totalAmount: 320000,
-            paymentStatus: "Paid",
-            paymentMethod: "Stripe",
-            transactionId: "TXN-STRIPE-771920",
-            createdAt: "2026-09-15T16:45:00Z",
-          },
-          {
-            id: "BKG-98405",
-            bookingReference: "BKG-98405",
-            customer: { name: "Vikram Sengupta", email: "vikram.s@fintech.in", phone: "+91 94330 99881" },
-            destination: { name: "Neon Tokyo & Mount Fuji", location: "Tokyo, Japan" },
-            startDate: "2026-10-30",
-            totalAmount: 140000,
-            paymentStatus: "Refunded",
-            paymentMethod: "Credit Card",
-            transactionId: "TXN-REF-449102",
-            createdAt: "2026-09-14T11:00:00Z",
-          },
-        ];
+        console.error("Backend transactions API error:", apiErr.message);
+        fetched = [];
       }
 
       setBookings(fetched);
@@ -217,15 +150,15 @@ const PaymentAndRevenue = () => {
     const avgTicketSize = paidCount > 0 ? Math.round(paidVolume / paidCount) : 0;
 
     return {
-      grossVolume: grossVolume || 1845000,
-      paidVolume: paidVolume || 1580000,
-      netPayout: netPayout || 1529440,
-      pendingVolume: pendingVolume || 190000,
-      refundedVolume: refundedVolume || 75000,
+      grossVolume,
+      paidVolume,
+      netPayout,
+      pendingVolume,
+      refundedVolume,
       paidCount,
       pendingCount,
       refundedCount,
-      avgTicketSize: avgTicketSize || 125000,
+      avgTicketSize,
     };
   }, [bookings]);
 

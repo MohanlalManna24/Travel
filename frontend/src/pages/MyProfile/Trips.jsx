@@ -1,12 +1,47 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FiMapPin, FiCalendar, FiPlusCircle } from "react-icons/fi";
 import DestinationCards from "../../components/DestinationCards";
+import axios from "axios";
+import useAuthStore from "../../zustand/authStore";
 
 const Trips = () => {
-  const totalTrips = 24;
-  const upcomingTrips = 3;
-  const thisYearBookings = 2;
+  const { user } = useAuthStore();
+  const [totalTrips, setTotalTrips] = useState(0);
+  const [upcomingTrips, setUpcomingTrips] = useState(0);
+  const [thisYearBookings, setThisYearBookings] = useState(0);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await axios.get("http://localhost:4000/api/bookings", { withCredentials: true });
+        const all = Array.isArray(res.data) ? res.data : res.data?.bookings || res.data?.data || [];
+        const userEmail = (user?.email || "").toLowerCase().trim();
+        const userId = user?.id;
+
+        const myBookings = all.filter((b) => {
+          const bEmail = (b.customer?.email || b.customer_email || b.email || "").toLowerCase().trim();
+          const bUserId = b.userId || b.user_id || b.customer?.id;
+          return (userEmail && bEmail === userEmail) || (userId && String(bUserId) === String(userId));
+        });
+
+        setTotalTrips(myBookings.length);
+        const now = new Date();
+        const upcoming = myBookings.filter((b) => new Date(b.startDate || b.start_date || b.travelDate) >= now);
+        setUpcomingTrips(upcoming.length);
+        const thisYear = myBookings.filter((b) => {
+          const d = new Date(b.startDate || b.start_date || b.createdAt || b.created_at);
+          return d.getFullYear() === now.getFullYear();
+        });
+        setThisYearBookings(thisYear.length);
+      } catch {
+        setTotalTrips(0);
+        setUpcomingTrips(0);
+        setThisYearBookings(0);
+      }
+    };
+    fetchStats();
+  }, [user]);
 
   return (
     <div className="min-h-screen px-4 py-8 sm:px-6 lg:px-10">

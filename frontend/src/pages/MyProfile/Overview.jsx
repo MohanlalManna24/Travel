@@ -29,7 +29,7 @@ const Overview = () => {
   useEffect(() => {
     // 1. Read stored user details
     try {
-      const storedUser = localStorage.getItem("user");
+      const storedUser = localStorage.getItem("travel_user") || localStorage.getItem("user");
       if (storedUser) {
         const parsed = JSON.parse(storedUser);
         setUser({
@@ -38,6 +38,7 @@ const Overview = () => {
           phone: parsed.phone || "",
           avatar:
             parsed.avatar ||
+            parsed.profile_img ||
             "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=256&auto=format&fit=crop",
           role: parsed.role || "VIP Explorer",
         });
@@ -55,16 +56,8 @@ const Overview = () => {
         const data = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : [];
         setBookings(data.slice(0, 3));
       } catch (err) {
-        // Fallback
-        setBookings([
-          {
-            id: "BKG-98401",
-            destination: { name: "Paris Grand Escape", location: "Paris, France" },
-            startDate: "2026-10-15",
-            totalAmount: 185000,
-            bookingStatus: "Confirmed",
-          },
-        ]);
+        console.error("Failed to fetch bookings:", err.message);
+        setBookings([]);
       } finally {
         setLoading(false);
       }

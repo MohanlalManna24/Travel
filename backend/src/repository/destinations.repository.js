@@ -85,6 +85,7 @@ export const getAllDestinations = async () => {
 };
 
 export const getDestinationById = async (id) => {
+  const cleanId = typeof id === "string" && id.startsWith("destination-") ? id.replace("destination-", "") : id;
   const [rows] = await pool.query(
     `SELECT 
       id,
@@ -102,12 +103,13 @@ export const getDestinationById = async (id) => {
       created_at,
       updated_at
     FROM destinations WHERE id = ?`,
-    [id]
+    [cleanId]
   );
   return rows[0] || null;
 };
 
 export const updateDestinations = async (id, details) => {
+  const cleanId = typeof id === "string" && id.startsWith("destination-") ? id.replace("destination-", "") : id;
   const {
     title,
     name,
@@ -122,20 +124,19 @@ export const updateDestinations = async (id, details) => {
     status,
   } = details;
 
-  const existing = await getDestinationById(id);
-  if (!existing) return null;
+  const current = await getDestinationById(cleanId);
+  if (!current) return null;
 
-  const destinationTitle = title !== undefined ? title : (name !== undefined ? name : existing.title);
-  const destinationDesc = description !== undefined ? description : existing.description;
-  const destinationImage = image !== undefined ? image : existing.image;
-  const destinationPrice = price !== undefined ? Number(price) : (pricePerHead !== undefined ? Number(pricePerHead) : existing.price);
-  const destinationDays = days !== undefined ? Number(days) : existing.days;
-  const destinationStatus = status !== undefined ? status.toLowerCase() : existing.status;
+  const destinationTitle = title ?? name ?? current.title;
+  const destinationDesc = description ?? current.description;
+  const destinationImage = image ?? current.image;
+  const destinationPrice = Number(price ?? pricePerHead ?? current.price);
+  const destinationDays = Number(days ?? current.days);
+  const destinationStatus = (status ?? current.status ?? "active").toLowerCase();
 
-  let finalCountry = country !== undefined ? country : existing.country;
-  let finalState = state !== undefined ? state : existing.state;
-
-  if (location !== undefined) {
+  let finalCountry = country ?? current.country;
+  let finalState = state ?? current.state;
+  if (location && !country && !state) {
     const parts = location.split(",").map((s) => s.trim());
     if (parts.length > 1) {
       finalState = parts[0];
@@ -146,7 +147,7 @@ export const updateDestinations = async (id, details) => {
   }
 
   await pool.query(
-    `UPDATE destinations SET
+    `UPDATE destinations SET 
       title = ?,
       description = ?,
       image = ?,
@@ -165,24 +166,25 @@ export const updateDestinations = async (id, details) => {
       destinationPrice,
       destinationDays,
       destinationStatus,
-      id,
+      cleanId,
     ],
   );
 
-  return await getDestinationById(id);
+  return await getDestinationById(cleanId);
 };
 
 export const deleteDestinations = async (id) => {
+  const cleanId = typeof id === "string" && id.startsWith("destination-") ? id.replace("destination-", "") : id;
   const [result] = await pool.query("DELETE FROM destinations WHERE id = ?", [
-    id,
+    cleanId,
   ]);
   return result.affectedRows > 0;
 };
 
 export const checkDestinationsExists = async (id) => {
+  const cleanId = typeof id === "string" && id.startsWith("destination-") ? id.replace("destination-", "") : id;
   const [rows] = await pool.query("SELECT id FROM destinations WHERE id = ?", [
-    id,
+    cleanId,
   ]);
   return rows.length > 0;
 };
-

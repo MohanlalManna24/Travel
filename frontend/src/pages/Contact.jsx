@@ -74,9 +74,8 @@ const Contact = () => {
       );
       setIsSubmitted(true);
     } catch (err) {
-      console.warn("Notification submission notice:", err.message);
-      // Even if backend has strict CORS or mock, show successful confirmation
-      setIsSubmitted(true);
+      console.error("Notification submission error:", err.message);
+      setErrorMessage(err.response?.data?.message || "Unable to send your inquiry at this moment. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

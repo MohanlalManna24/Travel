@@ -99,13 +99,7 @@ const BookingManagement = () => {
     setError(null);
 
     try {
-      let response;
-      try {
-        response = await axios.get(BOOKINGS_URL);
-      } catch (backendErr) {
-        console.warn("Backend bookings endpoint failed, falling back to /bookingsData.json:", backendErr);
-        response = await axios.get("/bookingsData.json");
-      }
+      let response = await axios.get(BOOKINGS_URL);
 
       const rawData = response.data;
       const fetchedBookings = Array.isArray(rawData)

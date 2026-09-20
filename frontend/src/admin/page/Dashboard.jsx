@@ -87,13 +87,9 @@ const Dashboard = () => {
           : Array.isArray(bookRes.data)
           ? bookRes.data
           : [];
-      } catch {
-        try {
-          const fallbackRes = await axios.get("/bookingsData.json");
-          fetchedBookings = Array.isArray(fallbackRes.data) ? fallbackRes.data : [];
-        } catch {
-          fetchedBookings = [];
-        }
+      } catch (err) {
+        console.error("Failed to fetch dashboard bookings:", err.message);
+        fetchedBookings = [];
       }
 
       // 2. Fetch Destinations / Trips
@@ -110,13 +106,9 @@ const Dashboard = () => {
           : Array.isArray(destRes.data)
           ? destRes.data
           : [];
-      } catch {
-        try {
-          const fallbackDest = await axios.get("/destinations.json");
-          fetchedDestinations = Array.isArray(fallbackDest.data) ? fallbackDest.data : [];
-        } catch {
-          fetchedDestinations = [];
-        }
+      } catch (err) {
+        console.error("Failed to fetch dashboard destinations:", err.message);
+        fetchedDestinations = [];
       }
 
       // 3. Fetch Users
@@ -151,89 +143,6 @@ const Dashboard = () => {
         } catch {
           fetchedUsers = [];
         }
-      }
-
-      // If datasets are empty, supply mock rich fallbacks so dashboard is vibrant & instantly functional
-      if (fetchedBookings.length === 0) {
-        fetchedBookings = [
-          {
-            id: "BK-8901",
-            bookingCode: "GA-PAR-8901",
-            customer: { name: "Aarav Sharma", email: "aarav.sharma@example.com", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=256&auto=format&fit=crop" },
-            destination: { title: "Enchanted Parisian Romance", location: "Paris, France" },
-            bookingDate: "2026-09-18",
-            passengers: { total: 2 },
-            totalPrice: 165000,
-            status: "confirmed",
-            paymentStatus: "paid",
-          },
-          {
-            id: "BK-8902",
-            bookingCode: "GA-SWI-8902",
-            customer: { name: "Ananya Patel", email: "ananya.p@example.com", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&auto=format&fit=crop" },
-            destination: { title: "Swiss Alpine Wonderland", location: "Interlaken, Switzerland" },
-            bookingDate: "2026-09-17",
-            passengers: { total: 4 },
-            totalPrice: 340000,
-            status: "confirmed",
-            paymentStatus: "paid",
-          },
-          {
-            id: "BK-8903",
-            bookingCode: "GA-BAL-8903",
-            customer: { name: "Rohan Verma", email: "rohan.v@example.com", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?q=80&w=256&auto=format&fit=crop" },
-            destination: { title: "Bali Tropical Sanctuary", location: "Ubud, Bali" },
-            bookingDate: "2026-09-16",
-            passengers: { total: 2 },
-            totalPrice: 95000,
-            status: "pending",
-            paymentStatus: "unpaid",
-          },
-          {
-            id: "BK-8904",
-            bookingCode: "GA-TOK-8904",
-            customer: { name: "Sneha Mukherjee", email: "sneha.m@example.com", avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=256&auto=format&fit=crop" },
-            destination: { title: "Neon Tokyo & Mount Fuji", location: "Tokyo, Japan" },
-            bookingDate: "2026-09-14",
-            passengers: { total: 3 },
-            totalPrice: 285000,
-            status: "confirmed",
-            paymentStatus: "paid",
-          },
-          {
-            id: "BK-8905",
-            bookingCode: "GA-DUB-8905",
-            customer: { name: "Vikram Sengupta", email: "vikram.s@example.com", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=256&auto=format&fit=crop" },
-            destination: { title: "Dubai Golden Mirage & Safari", location: "Dubai, UAE" },
-            bookingDate: "2026-09-12",
-            passengers: { total: 1 },
-            totalPrice: 78000,
-            status: "cancelled",
-            paymentStatus: "refunded",
-          },
-          {
-            id: "BK-8906",
-            bookingCode: "GA-KSH-8906",
-            customer: { name: "Priya Nair", email: "priya.nair@example.com", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=256&auto=format&fit=crop" },
-            destination: { title: "Kashmir Paradise Odyssey", location: "Srinagar & Gulmarg, India" },
-            bookingDate: "2026-09-10",
-            passengers: { total: 2 },
-            totalPrice: 62000,
-            status: "confirmed",
-            paymentStatus: "paid",
-          },
-        ];
-      }
-
-      if (fetchedDestinations.length === 0) {
-        fetchedDestinations = [
-          { id: 1, title: "Enchanted Parisian Romance", location: "Paris, France", price: 82500, rating: 4.9, active: true, image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=600&auto=format&fit=crop" },
-          { id: 2, title: "Swiss Alpine Wonderland", location: "Interlaken, Switzerland", price: 85000, rating: 5.0, active: true, image: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?q=80&w=600&auto=format&fit=crop" },
-          { id: 3, title: "Bali Tropical Sanctuary", location: "Ubud, Bali", price: 47500, rating: 4.8, active: true, image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=600&auto=format&fit=crop" },
-          { id: 4, title: "Neon Tokyo & Mount Fuji", location: "Tokyo, Japan", price: 95000, rating: 4.9, active: true, image: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=600&auto=format&fit=crop" },
-          { id: 5, title: "Dubai Golden Mirage & Safari", location: "Dubai, UAE", price: 78000, rating: 4.7, active: true, image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=600&auto=format&fit=crop" },
-          { id: 6, title: "Kashmir Paradise Odyssey", location: "Srinagar & Gulmarg, India", price: 31000, rating: 4.9, active: true, image: "https://images.unsplash.com/photo-1595815771614-ade9d652a65d?q=80&w=600&auto=format&fit=crop" },
-        ];
       }
 
       setBookings(fetchedBookings);
@@ -285,21 +194,21 @@ const Dashboard = () => {
       }
     });
 
-    const totalBookingCount = bookings.length || 1;
-    const successRate = ((confirmedBookings / totalBookingCount) * 100).toFixed(1);
-    const activeDestinationsCount = destinations.filter((d) => d.active !== false).length;
-    const totalTravelersCount = users.length > 0 ? users.length : bookings.length * 3 + 42;
+    const totalBookingCount = bookings.length;
+    const successRate = totalBookingCount > 0 ? ((confirmedBookings / totalBookingCount) * 100).toFixed(1) : "0.0";
+    const activeDestinationsCount = destinations.filter((d) => (d.status || "").toLowerCase() !== "inactive").length;
+    const totalTravelersCount = users.length;
 
     return {
-      grossRevenue: totalRevenue > 0 ? totalRevenue : 1245000,
-      paidRevenue: paidRevenue > 0 ? paidRevenue : 1080000,
+      grossRevenue: totalRevenue,
+      paidRevenue: paidRevenue,
       pendingRevenue,
-      totalBookings: bookings.length > 0 ? bookings.length : 142,
+      totalBookings: bookings.length,
       confirmedBookings,
       pendingBookings,
       cancelledBookings,
-      successRate: isNaN(successRate) ? "94.2" : successRate,
-      activeDestinations: activeDestinationsCount > 0 ? activeDestinationsCount : destinations.length,
+      successRate,
+      activeDestinations: activeDestinationsCount,
       totalTravelers: totalTravelersCount,
     };
   }, [bookings, destinations, users]);

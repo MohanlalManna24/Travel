@@ -13,118 +13,13 @@ import { FaSuitcaseRolling, FaPlaneDeparture } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-const defaultDestinations = [
-  {
-    id: "destination-1",
-    name: "Parisian Elegance & Loire Valley",
-    location: "Paris & Loire, France",
-    category: "City & Romance",
-    badge: "Most Popular",
-    description:
-      "Curated after-hours Louvre access, private historic châteaux tours, Michelin-starred gastronomy, and private Seine yacht cruises.",
-    image:
-      "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80",
-    pricePerHead: 3200,
-    originalPrice: 3800,
-    days: 5,
-    rating: 4.98,
-    reviewsCount: 142,
-    inclusions: ["5-Star Palace Hotel", "Private Art Historian", "Michelin Dinner"],
-  },
-  {
-    id: "destination-2",
-    name: "Swiss Alps & Glacier Panoramic Express",
-    location: "Zermatt & St. Moritz, Switzerland",
-    category: "Alps & Mountains",
-    badge: "Top Rated",
-    description:
-      "Private luxury panoramic train voyages through snowcapped Alpine peaks, helicopter glacier tours, and cozy fireside chalets.",
-    image:
-      "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=800&q=80",
-    pricePerHead: 4100,
-    originalPrice: 4750,
-    days: 7,
-    rating: 5.0,
-    reviewsCount: 98,
-    inclusions: ["Glacier Express Excellence", "Luxury Chalet", "Ski Pass & Guide"],
-  },
-  {
-    id: "destination-3",
-    name: "Bali Serenity & Nusa Penida Sanctuary",
-    location: "Ubud & Seminyak, Indonesia",
-    category: "Tropical Islands",
-    badge: "Best Value",
-    description:
-      "Cliffside infinity villas, sacred water cleansing rituals, private yacht day trips to manta ray sanctuaries, and organic jungle dining.",
-    image:
-      "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80",
-    pricePerHead: 1950,
-    originalPrice: 2400,
-    days: 6,
-    rating: 4.92,
-    reviewsCount: 215,
-    inclusions: ["Private Pool Villa", "Yacht Island Charter", "Spa & Wellness"],
-  },
-  {
-    id: "destination-4",
-    name: "Kyoto Imperial Heritage & Mount Fuji",
-    location: "Kyoto & Hakone, Japan",
-    category: "Heritage & Culture",
-    badge: "Seasonal Special",
-    description:
-      "Centuries-old private onsen ryokans, private tea master ceremonies, bamboo groves, and bullet train first-class transfers.",
-    image:
-      "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80",
-    pricePerHead: 3600,
-    originalPrice: 4200,
-    days: 8,
-    rating: 4.96,
-    reviewsCount: 164,
-    inclusions: ["Historic Ryokan Stay", "Kaiseki Dinners", "Bullet Train Pass"],
-  },
-  {
-    id: "destination-5",
-    name: "Santorini Cliffside Sunsets & Aegean Sea",
-    location: "Oia & Fira, Greece",
-    category: "Mediterranean Beach",
-    badge: "Romantic Escape",
-    description:
-      "Whitewashed cave suites hanging over the caldera, private sunset catamaran cruises with wine tastings, and secluded volcanic beaches.",
-    image:
-      "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=800&q=80",
-    pricePerHead: 2800,
-    originalPrice: 3300,
-    days: 5,
-    rating: 4.95,
-    reviewsCount: 180,
-    inclusions: ["Caldera Cave Suite", "Sunset Yacht Cruise", "Sommelier Tour"],
-  },
-  {
-    id: "destination-6",
-    name: "Amalfi Coastline & Capri Private Yachting",
-    location: "Positano & Capri, Italy",
-    category: "Luxury Escapes",
-    badge: "Exclusive VIP",
-    description:
-      "Bespoke Riva boat charters around the Faraglioni cliffs, cliffside lemon grove retreats, and private shopping in Capri.",
-    image:
-      "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80",
-    pricePerHead: 3450,
-    originalPrice: 4100,
-    days: 6,
-    rating: 5.0,
-    reviewsCount: 112,
-    inclusions: ["5-Star Positano Suite", "Riva Speedboat Cruise", "Private Driver"],
-  },
-];
-
 const DestinationCards = ({
   detailsBasePath = "/destination",
   searchQuery = "",
   categoryFilter = "All",
   limit,
 }) => {
-  const [destinations, setDestinations] = useState(defaultDestinations);
+  const [destinations, setDestinations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [wishlist, setWishlist] = useState(() => {
     try {
@@ -157,34 +52,45 @@ const DestinationCards = ({
 
         const endpoint = API_URL.includes("/api/") ? API_URL : `${API_URL}/api/destinations`;
         const res = await axios.get(endpoint);
-        const data = Array.isArray(res.data) ? res.data : res.data?.destinations || [];
+        const data = Array.isArray(res.data) ? res.data : res.data?.destinations || res.data?.data || [];
 
-        if (data.length > 0) {
+        if (Array.isArray(data)) {
           const normalized = data.map((d, i) => {
-            const fallback = defaultDestinations[i % defaultDestinations.length];
+            const rawLocation =
+              d.location ||
+              [d.state, d.country].filter(Boolean).join(", ") ||
+              "Global Sanctuary";
+            const price = Number(d.pricePerHead ?? d.price ?? 0);
             return {
-              id: d.id || `destination-${i + 1}`,
-              name: d.name || d.title || fallback.name,
-              location: d.location || d.country || fallback.location,
-              category: d.category || fallback.category,
-              badge: d.badge || fallback.badge,
-              description: d.description || fallback.description,
-              image: d.image || d.heroImage || fallback.image,
-              pricePerHead: Number(d.pricePerHead ?? d.price ?? fallback.pricePerHead),
-              originalPrice: Number(d.originalPrice ?? (Number(d.pricePerHead ?? d.price ?? 3000) * 1.2)),
-              days: d.days || fallback.days,
-              rating: Number(d.rating || fallback.rating),
-              reviewsCount: d.reviewsCount || fallback.reviewsCount,
-              inclusions: Array.isArray(d.inclusions) ? d.inclusions : fallback.inclusions,
+              id: d.id || `dest-${i + 1}`,
+              name: d.name || d.title || "Curated Destination",
+              location: rawLocation,
+              category: d.category || "Luxury Escapes",
+              badge: d.badge || (i === 0 ? "Featured" : "Bespoke"),
+              description:
+                d.description ||
+                "Immersive handpicked travel experience with 5-star accommodations, private guides, and bespoke itineraries.",
+              image:
+                d.image ||
+                d.heroImage ||
+                "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+              pricePerHead: price,
+              originalPrice: price > 0 ? Math.round(price * 1.2) : 0,
+              days: Number(d.days || 3),
+              rating: Number(d.rating || 5.0),
+              reviewsCount: Number(d.reviewsCount || 0),
+              inclusions: Array.isArray(d.inclusions) && d.inclusions.length > 0
+                ? d.inclusions
+                : ["Luxury Accommodation", "Private Concierge", "Curated Excursions"],
             };
           });
           setDestinations(normalized);
         } else {
-          setDestinations(defaultDestinations);
+          setDestinations([]);
         }
       } catch (err) {
-        console.warn("Using default luxury destinations:", err.message);
-        setDestinations(defaultDestinations);
+        console.error("Error fetching destinations from database:", err.message);
+        setDestinations([]);
       } finally {
         setIsLoading(false);
       }

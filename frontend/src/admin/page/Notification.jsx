@@ -106,9 +106,8 @@ const Notification = () => {
           ? response.data
           : [];
       } catch (apiErr) {
-        console.warn("Backend API unavailable, loading fallback real notification seed:", apiErr.message);
-        const fallbackRes = await axios.get("/notificationsData.json");
-        data = Array.isArray(fallbackRes.data) ? fallbackRes.data : [];
+        console.error("Backend notifications API unavailable:", apiErr.message);
+        data = [];
       }
 
       setNotifications(data);

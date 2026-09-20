@@ -19,110 +19,85 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import useAuthStore from "../zustand/authStore";
 
-const fallbackDestination = {
-  id: "destination-1",
-  name: "Parisian Elegance & Loire Valley",
-  location: "Paris, France",
-  duration: "5 Days / 4 Nights",
-  description:
-    "Experience the pinnacle of French luxury with curated VIP access to Paris's most exclusive cultural monuments, Michelin dining, and private Loire Valley vineyards.",
-  image:
-    "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
-  pricePerHead: 3200,
-  currency: "$",
-  highlights: [
-    {
-      title: "5-Star Palace Stay",
-      description: "Historic suite overlooking the Champs-Élysées with private butler service.",
-      image:
-        "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      title: "After-Hours Louvre Tour",
-      description: "Private art historian guided tour without the crowds.",
-      image:
-        "https://images.unsplash.com/photo-1564399579883-451a5d44ec08?auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      title: "Seine Gourmet Yacht Cruise",
-      description: "Champagne pairing and Michelin tasting menu on a private vessel.",
-      image:
-        "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      title: "Château Wine Tasting",
-      description: "Exclusive vintage cellar tour in the Loire Valley.",
-      image:
-        "https://images.unsplash.com/photo-1558326567-98ae2405596b?auto=format&fit=crop&w=800&q=80",
-    },
-  ],
-  itinerary: [
-    {
-      day: "Day 1",
-      title: "Arrival & Champagne Welcome",
-      description:
-        "VIP transfer to your luxury hotel. Settle in before joining an exclusive evening welcome dinner with sommelier pairings.",
-    },
-    {
-      day: "Day 2",
-      title: "Private Louvre & Montmartre Sunset",
-      description:
-        "Tour the Louvre before opening hours. In the late afternoon, enjoy a private walking tour of the artistic Montmartre quarter.",
-    },
-    {
-      day: "Day 3",
-      title: "Culinary Arts & Seine River Cruise",
-      description:
-        "Masterclass with an artisanal French pastry chef followed by a moonlit private yacht dinner along the Seine.",
-    },
-    {
-      day: "Day 4",
-      title: "Versailles Royal Estates",
-      description:
-        "Full-day excursion with priority entry to the Hall of Mirrors and private access to the Queen's Hamlet.",
-    },
-    {
-      day: "Day 5",
-      title: "Haute Couture & Departure",
-      description:
-        "Curated personal shopping experience followed by luxury transfer to Charles de Gaulle Airport.",
-    },
-  ],
-  gallery: [
-    "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=900&q=80",
-    "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=900&q=80",
-    "https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=900&q=80",
-    "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=900&q=80",
-  ],
-};
-
 const normalizeDestination = (payload) => {
   const data = payload?.destination || payload?.data || payload;
-  if (!data || typeof data !== "object") return fallbackDestination;
+  if (!data || typeof data !== "object") return null;
+
+  const rawLocation =
+    data.location ||
+    [data.state, data.country].filter(Boolean).join(", ") ||
+    "Global Sanctuary";
+
+  const price = Number(data.pricePerHead ?? data.price ?? 0);
+  const days = Number(data.days || 3);
+  const heroImg =
+    data.image ||
+    data.heroImage ||
+    data.coverImage ||
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80";
 
   return {
-    ...fallbackDestination,
-    ...data,
-    name: data.name || data.title || fallbackDestination.name,
-    location: data.location || data.country || fallbackDestination.location,
-    image:
-      data.image ||
-      data.heroImage ||
-      data.coverImage ||
-      fallbackDestination.image,
-    pricePerHead: Number(data.pricePerHead ?? data.price ?? fallbackDestination.pricePerHead),
-    highlights: data.highlights?.length ? data.highlights : fallbackDestination.highlights,
-    itinerary: data.itinerary?.length ? data.itinerary : fallbackDestination.itinerary,
-    gallery: data.gallery?.length ? data.gallery : fallbackDestination.gallery,
+    id: data.id,
+    name: data.name || data.title || "Curated Destination",
+    title: data.title || data.name || "Curated Destination",
+    location: rawLocation,
+    duration: `${days} Days / ${Math.max(1, days - 1)} Nights`,
+    description:
+      data.description ||
+      "Bespoke itinerary with curated private access, 5-star luxury accommodations, gourmet dining, and private chauffeur transfers.",
+    image: heroImg,
+    pricePerHead: price,
+    currency: "$",
+    highlights: Array.isArray(data.highlights) && data.highlights.length > 0
+      ? data.highlights
+      : [
+          {
+            title: "5-Star Luxury Stay",
+            description: "Private villa or palace suite with bespoke 24/7 butler service.",
+            image: heroImg,
+          },
+          {
+            title: "Private Guided Expeditions",
+            description: "Dedicated local specialist and VIP priority admissions without queues.",
+            image: "https://images.unsplash.com/photo-1564399579883-451a5d44ec08?auto=format&fit=crop&w=800&q=80",
+          },
+          {
+            title: "Gourmet Culinary Journey",
+            description: "Private sommelier tastings and curated multi-course chef tables.",
+            image: "https://images.unsplash.com/photo-1558326567-98ae2405596b?auto=format&fit=crop&w=800&q=80",
+          },
+        ],
+    itinerary: Array.isArray(data.itinerary) && data.itinerary.length > 0
+      ? data.itinerary
+      : [
+          {
+            day: "Day 1",
+            title: "Private Arrival & Welcome Reception",
+            description: "VIP airport transfer, luxury suite check-in, and an intimate welcome dinner.",
+          },
+          {
+            day: "Day 2",
+            title: "Exclusive Private Expedition",
+            description: "Full-day curated tour of iconic landmarks and private sanctuaries.",
+          },
+          {
+            day: "Day 3",
+            title: "Haute Gastronomy & Leisure",
+            description: "Relaxed morning followed by bespoke culinary masterclasses and sunset excursions.",
+          },
+        ],
+    gallery: Array.isArray(data.gallery) && data.gallery.length > 0
+      ? data.gallery
+      : [heroImg],
   };
 };
 
 const DetailsDestination = () => {
-  const { destinationId = "destination-1" } = useParams();
+  const { destinationId = "1" } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthStore();
 
-  const [destination, setDestination] = useState(fallbackDestination);
+  const [destination, setDestination] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [travelerCount, setTravelerCount] = useState(2);
   const [startDate, setStartDate] = useState("2026-10-15");
@@ -152,16 +127,17 @@ const DetailsDestination = () => {
     axios
       .get(`${API_URL}/api/destinations/${destinationId}`)
       .then((res) => {
-        setDestination(normalizeDestination(res.data));
+        const norm = normalizeDestination(res.data);
+        setDestination(norm);
       })
       .catch((err) => {
-        console.warn("Using fallback destination payload:", err.message);
-        setDestination(fallbackDestination);
+        console.error("Error fetching destination:", err.message);
+        setDestination(null);
       })
       .finally(() => setIsLoading(false));
   }, [destinationId]);
 
-  const pricePerPerson = Number(destination.pricePerHead || 3200);
+  const pricePerPerson = Number(destination?.pricePerHead || 0);
   const totalCalculated = pricePerPerson * travelerCount;
 
   const handleOpenBooking = () => {
@@ -184,8 +160,8 @@ const DetailsDestination = () => {
         customerName: contactName.trim() || user?.fullname || "Traveler",
         customerEmail: contactEmail.trim() || user?.email || "user@example.com",
         customerPhone: contactPhone.trim() || user?.phone || "N/A",
-        destination: destination.name,
-        tripTitle: destination.name,
+        destination: destination?.name || "Custom Trip",
+        tripTitle: destination?.name || "Custom Trip",
         startDate: startDate,
         endDate: endDate,
         travelDate: startDate,
@@ -201,29 +177,49 @@ const DetailsDestination = () => {
         withCredentials: true,
       });
 
-      const savedBooking = res.data?.booking || res.data || {
+      const savedBooking = res.data?.booking || res.data?.data || res.data || {
         ...bookingPayload,
         bookingReference: `BK-${Math.floor(100000 + Math.random() * 900000)}`,
       };
 
       setConfirmedBooking(savedBooking);
     } catch (err) {
-      console.warn("Booking creation notice:", err.message);
-      // Fallback valid confirmation for smooth user experience
-      setConfirmedBooking({
-        bookingReference: `BK-${Math.floor(100000 + Math.random() * 900000)}`,
-        tripTitle: destination.name,
-        destination: destination.location,
-        travelDate: startDate,
-        returnDate: endDate,
-        travelersCount: travelerCount,
-        totalAmount: totalCalculated,
-        status: "CONFIRMED",
-      });
+      console.error("Booking error:", err.message);
+      setBookingError(err.response?.data?.message || "Failed to create booking reservation. Please retry.");
     } finally {
       setIsBookingSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-cyan-400 border-t-transparent" />
+          <p className="text-sm font-semibold tracking-wide">Retrieving Destination Details...</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (!destination) {
+    return (
+      <main className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-100 px-4 py-20">
+        <div className="max-w-md w-full text-center bg-slate-900/60 p-8 rounded-3xl border border-white/10 backdrop-blur-xl">
+          <h2 className="text-2xl font-black text-white mb-2">Destination Not Found</h2>
+          <p className="text-slate-400 text-sm mb-6">
+            The requested destination record does not exist or may have been removed.
+          </p>
+          <Link
+            to="/destination"
+            className="inline-flex items-center gap-2 rounded-full bg-cyan-400 px-6 py-3 text-xs font-black uppercase tracking-wider text-slate-950 hover:bg-cyan-300 transition"
+          >
+            <FiArrowLeft /> Return to All Destinations
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100 pb-20">

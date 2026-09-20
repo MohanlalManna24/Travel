@@ -167,61 +167,28 @@ const UserProfileHub = () => {
       try {
         setLoadingBookings(true);
         const res = await authClient.get("/api/bookings");
-        const allBookings = Array.isArray(res.data) ? res.data : res.data?.bookings || [];
+        const allBookings = Array.isArray(res.data) ? res.data : res.data?.bookings || res.data?.data || [];
 
         if (isMounted) {
           if (user) {
-            const userEmail = (user.email || "").toLowerCase();
+            const userEmail = (user.email || "").toLowerCase().trim();
             const userId = user.id;
 
             const filtered = allBookings.filter((b) => {
-              const bEmail = (b.customer?.email || b.customer_email || b.email || "").toLowerCase();
+              const bEmail = (b.customer?.email || b.customer_email || b.email || "").toLowerCase().trim();
               const bUserId = b.userId || b.user_id || b.customer?.id;
-              return (userEmail && bEmail === userEmail) || (userId && bUserId === userId);
+              return (userEmail && bEmail === userEmail) || (userId && String(bUserId) === String(userId));
             });
 
-            setBookings(filtered.length > 0 ? filtered : allBookings.slice(0, 3));
+            setBookings(filtered);
           } else {
-            setBookings(allBookings.slice(0, 4));
+            setBookings([]);
           }
         }
       } catch (err) {
-        console.warn("Failed to fetch bookings, using defaults:", err.message);
+        console.error("Error fetching user bookings:", err.message);
         if (isMounted) {
-          setBookings([
-            {
-              id: "BKG-884920",
-              bookingReference: "BKG-884920",
-              destination: {
-                name: "Grand Switzerland & Alps Expedition",
-                location: "Zermatt & Interlaken, Switzerland",
-                image: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=600&q=80",
-              },
-              startDate: "2026-10-15",
-              endDate: "2026-10-22",
-              guests: 2,
-              totalAmount: 1850,
-              bookingStatus: "CONFIRMED",
-              paymentStatus: "PAID",
-              createdAt: "2026-09-18",
-            },
-            {
-              id: "BKG-993104",
-              bookingReference: "BKG-993104",
-              destination: {
-                name: "Tropical Bali Paradise & Nusa Penida",
-                location: "Ubud & Seminyak, Indonesia",
-                image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&q=80",
-              },
-              startDate: "2026-11-05",
-              endDate: "2026-11-12",
-              guests: 1,
-              totalAmount: 920,
-              bookingStatus: "PENDING",
-              paymentStatus: "PROCESSING",
-              createdAt: "2026-09-19",
-            },
-          ]);
+          setBookings([]);
         }
       } finally {
         if (isMounted) setLoadingBookings(false);
